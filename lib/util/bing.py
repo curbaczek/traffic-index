@@ -16,6 +16,7 @@ COLOR_UNWANTED_AREA = "FDFDFD"
 
 BING_API_KEY = "Ai0rTccAvUMSnqQgoBn0_PQZDlqkri9n_N9DcG_x6bQ2e7n2b3orpTWl9T22NZQV"
 
+
 def get_trafficmap_file_type():
     return FILE_TYPE
 
@@ -29,7 +30,9 @@ def get_map_image_height():
 
 
 def download_static_map(lat, lng, zoom, map_layer, local_filename):
-    map_link = "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/{},{}/{}?mapLayer={}&format={}&mapSize={},{}&labelOverlay=hidden&key={}".format(
+    map_link = """
+        http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/{},{}/{}?mapLayer={}&format={}&
+        mapSize={},{}&labelOverlay=hidden&key={}""".strip().format(
         lat, lng, zoom, map_layer, FILE_TYPE, BING_IMAGE_WIDTH, BING_IMAGE_HEIGHT, BING_API_KEY)
     download_file(map_link, local_filename)
     time.sleep(SLEEP_TIME)
@@ -57,5 +60,3 @@ def download_static_traffic_map(lat, lng, zoom, local_filename):
     tmp_static_map = download_temporary_static_map(lat, lng, zoom)
     print tmp_static_map
     image_analysis.get_difference_image(tmp_static_traffic_map, tmp_static_map, local_filename)
-   
-

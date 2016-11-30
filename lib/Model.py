@@ -3,6 +3,7 @@ SOURCE_GMAP = 'GMAP'
 SOURCE_BING = 'BING'
 SOURCE_OST = 'OPENSTREETMAP'
 
+
 class Location(object):
 
     def __init__(self, title, lat, lng, tile_map):
@@ -20,20 +21,20 @@ class TileMap(object):
     def appendTile(self, tile):
         self.tiles.append(tile)
 
-    #TODO
-    #def getActiveTiles(self):
-    #def getTraffic...
-    #def __str__(self):
-        
+    # TODO
+    # def getActiveTiles(self):
+    # def getTraffic...
+    # def __str__(self):
+
 
 class Tile(object):
 
     def __init__(self, x, y, zoom, data_src, time, area_analysis, traffic_snapshot):
         self.x = x
         self.y = y
-	    self.zoom = zoom
+        self.zoom = zoom
         self.data_src = data_src
-	    self.time = time
+        self.time = time
         self.active = True
         self.area_analysis = area_analysis
         self.traffic_snapshot = traffic_snapshot
@@ -59,13 +60,13 @@ class BingTile(Tile):
 
 class AreaAnalysis(object):
 
-    def __init__(self, roadmap_value, highway_value, manmade_value, nature_value, transit_value, unassigned_value):
-        self.roadmap = roadmap_value
-        self.highway = highway_value
-        self.manmade = manmade_value
-        self.nature = nature_value
-        self.transit = transit_value
-        self.unassigned = unassigned_value
+    def __init__(self, roadmap, highway, manmade, nature, transit, unassigned):
+        self.roadmap = roadmap
+        self.highway = highway
+        self.manmade = manmade
+        self.nature = nature
+        self.transit = transit
+        self.unassigned = unassigned
 
     def value_sum(self):
         return self.roadmap + self.highway + self.manmade + self.nature + self.transit + self.unassigned
@@ -105,19 +106,19 @@ class TrafficSnapshot(object):
     def __init__(self, time, data_src, zoom_level, traffic_analysis):
         self.time = time
         self.data_src = data_src
-	self.zoom_level = zoom_level
-	self.traffic_analysis = traffic_analysis
+        self.zoom_level = zoom_level
+        self.traffic_analysis = traffic_analysis
 
 
 class TrafficAnalysis(object):
 
-    def __init__(self, heavy_value, moderate_value, light_value, notraffic_value, noinformation_value, unassigned_value):
-        self.heavy = heavy_value
-        self.moderate = moderate_value
-        self.light = light_value
-        self.notraffic = notraffic_value
-        self.noinformation = noinformation_value
-        self.unassigned = unassigned_value
+    def __init__(self, heavy, moderate, light, notraffic, noinformation, unassigned):
+        self.heavy = heavy
+        self.moderate = moderate
+        self.light = light
+        self.notraffic = notraffic
+        self.noinformation = noinformation
+        self.unassigned = unassigned
 
     def value_sum(self):
         return self.heavy + self.moderate + self.light + self.notraffic + self.noinformation + self.unassigned
@@ -150,5 +151,3 @@ class TrafficAnalysis(object):
             self.get_light_portion()*100,
             self.get_notraffic_portion()*100,
             self.get_noinformation_portion()*100)
-
-
