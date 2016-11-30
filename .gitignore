@@ -1,0 +1,15 @@
+/*.html
+*~
+\#*\#
+*.pyc
+/build
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.bbl
+*.blg
+*.zip
+*~
