@@ -1,12 +1,14 @@
 from __future__ import division
+
 import os
 import yaml
-import distutils
-from distutils import dir_util
 
 from lib import model
+
 from lib.util.file import clear_dir
 from lib.util.file import copy_dir
+
+from lib.data_handler import load_location
 
 DEFAULT_BUILD_DIRECTORY = 'build'
 LOCATION_DATA_DIRECTORY = 'data/locations'
@@ -14,20 +16,23 @@ RES_DIRECTORY = 'res'
 
 
 def print_result_to_stdout(result):
-    # TODO
+    # TODO implement
     print("*** Analysis Result ***")
     print(result)
 
 
 def generate_html(result, build_directory):
-    # TODO
+    # TODO implement
     print("[ERROR] html output not yet implemented")
-    #html_generator.generate_html(build_directory, RES_DIRECTORY, result)
+    # html_generator.generate_html(build_directory, RES_DIRECTORY, result)
 
 
 def analyse_city(name, lat, lng, zoom_level):
-    # TODO
-    return model.Location(name, lat, lng, None)
+    location_data_dir = os.path.join(RES_DIRECTORY, LOCATION_DATA_DIRECTORY)
+    location = load_location(location_data_dir, name, lat, lng)
+    # TODO run area analysis
+    # TODO run traffic analysis
+    return location
 
 
 def get_parser():
@@ -61,7 +66,7 @@ def get_parser():
                         type=int,
                         help="zoom level to analyse",
                         required=True)
-    parser.add_argument('--cache', 
+    parser.add_argument('--cache',
                         type=str,
                         dest='cache_file')
     return parser

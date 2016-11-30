@@ -13,3 +13,4 @@
 *.blg
 *.zip
 *~
+/res/data/locations/*

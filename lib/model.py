@@ -1,22 +1,27 @@
 
 SOURCE_GMAP = 'GMAP'
 SOURCE_BING = 'BING'
-SOURCE_OST = 'OPENSTREETMAP'
 
 
 class Location(object):
 
-    def __init__(self, title, lat, lng, tile_map):
-        self.title = title
+    def __init__(self, name, lat, lng, tile_map):
+        self.name = name
         self.lat = lat
         self.lng = lng
         self.tile_map = tile_map
+
+    def __str__(self):
+        return "{} ({}, {})\n{}".format(self.name, str(self.lat), str(self.lng), str(self.tile_map))
 
 
 class TileMap(object):
 
     def __init__(self):
         self.tiles = []
+
+    def setTiles(self, tiles):
+        self.tiles = tiles
 
     def appendTile(self, tile):
         self.tiles.append(tile)
@@ -29,15 +34,14 @@ class TileMap(object):
 
 class Tile(object):
 
-    def __init__(self, x, y, zoom, data_src, time, area_analysis, traffic_snapshot):
+    def __init__(self, x, y, data_src, zoom, timestamp, file_format):
         self.x = x
         self.y = y
-        self.zoom = zoom
         self.data_src = data_src
-        self.time = time
+        self.zoom = zoom
+        self.timestamp = timestamp
+        self.file_format = file_format
         self.active = True
-        self.area_analysis = area_analysis
-        self.traffic_snapshot = traffic_snapshot
 
     def activate(self):
         self.active = True
@@ -45,17 +49,8 @@ class Tile(object):
     def deactivate(self):
         self.active = False
 
-
-class GMapTile(Tile):
-
-    def __init__(self, x, y, zoom, time, area_analysis, traffic_snapshot):
-        Tile.__init__(self, x, y, zoom, SOURCE_GMAP, time, area_analysis, traffic_snapshot)
-
-
-class BingTile(Tile):
-
-    def __init__(self, x, y, zoom, time, area_analysis, traffic_snapshot):
-        Tile.__init__(self, x, y, zoom, SOURCE_BING, time, area_analysis, traffic_snapshot)
+    def __str__(self):
+        return "{},{} @ zoom {} from {} at {}".format(self.x, self.y, self.zoom, self.data_src, self.timestamp)
 
 
 class AreaAnalysis(object):
