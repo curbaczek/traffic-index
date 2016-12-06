@@ -14,3 +14,4 @@
 *.zip
 *~
 /res/data/locations/*
+/temp/*

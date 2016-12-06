@@ -23,4 +23,4 @@ karlsruhe:
 	$(run_main) --city Karlsruhe --lat 49.0068900 --lng 8.4036530 --zoom 14 --debug --stdout
 
 tile-download:
-	$(run_get_image) --lat 49.0068900 --lng 8.4036530 --zoom 14 --tiles 2
+	$(run_get_image) --lat 49.0068900 --lng 8.4036530 --zoom 15 --tiles 2 --dest "temp"

@@ -1,10 +1,16 @@
 from abc import ABC, abstractmethod
+import time
+from lib import model
 
 
 class TileHandler(ABC):
 
     @abstractmethod
-    def getFileType(self):
+    def getFileFormat(self):
+        pass
+
+    @abstractmethod
+    def getDataSource(self):
         pass
 
     @abstractmethod
@@ -15,13 +21,16 @@ class TileHandler(ABC):
     def getTileHeight(self):
         pass
 
+    def createTile(self, x, y, zoom):
+        current_time = int(time.time())
+        return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat())
+
     @abstractmethod
-    def getTile(self, lat, lng, x, y, zoom):
-        """ load tile and return temporary filename """
+    def getTileImage(self, lat, lng, x, y, zoom, local_directory):
         pass
 
     @abstractmethod
-    def getTiles(self, lat, lng, zoom, tile_count):
+    def getTiles(self, lat, lng, zoom, tile_count, local_directory):
         pass
 
 
