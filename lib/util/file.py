@@ -1,6 +1,6 @@
 import os
 import shutil
-import urllib
+import urllib.request
 
 
 def clear_dir(dir_path):
@@ -26,4 +26,4 @@ def copy_file_makedirs(src, dst):
 
 
 def download_file(url, local_filename):
-    urllib.urlretrieve(url, local_filename)
+    urllib.request.urlretrieve(url, local_filename)

@@ -27,9 +27,10 @@ def generate_html(result, build_directory):
     # html_generator.generate_html(build_directory, RES_DIRECTORY, result)
 
 
-def analyse_city(name, lat, lng, zoom_level):
+def analyse_city(name, lat, lng, zoom_level, tile_count):
     location_data_dir = os.path.join(RES_DIRECTORY, LOCATION_DATA_DIRECTORY)
     location = load_location(location_data_dir, name, lat, lng)
+
     # TODO run area analysis
     # TODO run traffic analysis
     return location
@@ -69,6 +70,10 @@ def get_parser():
     parser.add_argument('--cache',
                         type=str,
                         dest='cache_file')
+    parser.add_argument('--tiles',
+                        type=int,
+                        help="number of tiles taken around the center one",
+                        dest='tile_count')
     return parser
 
 
@@ -78,7 +83,7 @@ if __name__ == "__main__":
     if args.cache_file and os.path.isfile(args.cache_file):
         location_result = yaml.load(open(args.cache_file, 'r'))
     else:
-        location_result = analyse_city(args.city, args.lat, args.lng, args.zoom)
+        location_result = analyse_city(args.city, args.lat, args.lng, args.zoom, args.tile_count)
         if args.cache_file:
             yaml.dump(location_result, open(args.cache_file, 'w'))
 
