@@ -39,8 +39,9 @@ if __name__ == "__main__":
     temp_dir = args.dest_dir
     os.makedirs(temp_dir, exist_ok=True)
 
-    # tile_center = area_handler.getTileImage(lat, lng, 0, 0, zoom, temp_dir)
-    # print(tile_center)
-    area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, temp_dir, printProgress=True)
+    tile_center = area_handler.getTileImage(args.lat, args.lng, 0, 0, args.zoom, temp_dir)
+    Image.open(tile_center).show()
+    print(tile_center)
+    # area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, temp_dir, printProgress=True)
 
     print("images loaded.")

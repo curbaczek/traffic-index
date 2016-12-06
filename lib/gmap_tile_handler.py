@@ -78,10 +78,10 @@ class GMapTileHandler(AreaTileHandler):
 
     SLEEP_TIME = 2
 
-    ROAD_AREA_COLOR = "000000"
-    HIGHWAY_AREA_COLOR = "000000"
-    MANMADE_AREA_COLOR = "000000"
-    NATURAL_AREA_COLOR = "000000"
+    ROAD_AREA_COLOR = "FF0000"
+    HIGHWAY_AREA_COLOR = "00FF00"
+    MANMADE_AREA_COLOR = "0000FF"
+    NATURAL_AREA_COLOR = "FFFFFF"
     TRANSIT_AREA_COLOR = "000000"
 
     DATA_SRC = "GMAP"
@@ -122,7 +122,21 @@ class GMapTileHandler(AreaTileHandler):
         return proj.fromPointToLatLng(newCenterPoint)
 
     def getMapStyle(self):
-        return ""
+        return (
+            "visibility:off&" +
+            "style=feature:landscape%7Celement:geometry%7Ccolor:0x{3}%7Cvisibility:on&" +
+            "style=feature:landscape.man_made%7Celement:geometry%7Ccolor:0x{2}%7Cvisibility:on&" +
+            "style=feature:poi.park%7Celement:geometry%7Ccolor:0x{3}%7Cvisibility:on&" +
+            "style=feature:road.arterial%7Celement:geometry%7Ccolor:0x{0}%7Cvisibility:on&" +
+            "style=feature:road.highway%7Celement:geometry%7Ccolor:0x{1}%7Cvisibility:on&" +
+            "style=feature:road.local%7Celement:geometry%7Ccolor:0x{0}%7Cvisibility:on&" +
+            "style=feature:transit%7Celement:geometry%7Ccolor:0x{4}%7Cvisibility:on&" +
+            "style=feature:water%7Celement:geometry%7Ccolor:0x{3}%7Cvisibility:on").format(
+            self.getRoadAreaColor(),
+            self.getHighwayAreaColor(),
+            self.getManMadeAreaColor(),
+            self.getNaturalAreaColor(),
+            self.getTransitAreaColor())
 
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):
         tileCenter = self.getMapCenter(lat, lng, zoom, x, y)
