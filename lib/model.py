@@ -120,34 +120,45 @@ class TrafficAnalysis(object):
         self.noinformation = noinformation
         self.unassigned = unassigned
 
-    def value_sum(self):
-        return self.heavy + self.moderate + self.light + self.notraffic + self.noinformation + self.unassigned
+    def get_overall_sum(self):
+        return self.get_assigned_sum() + self.unassigned
+
+    def get_assigned_sum(self):
+        return self.get_traffic_sum() + self.noinformation
+
+    def get_traffic_sum(self):
+        return self.heavy + self.moderate + self.light + self.notraffic
 
     def get_heavy_portion(self):
-        return self.heavy/self.value_sum()
+        return self.heavy/self.get_overall_sum()
 
     def get_moderate_portion(self):
-        return self.moderate/self.value_sum()
+        return self.moderate/self.get_overall_sum()
 
     def get_light_portion(self):
-        return self.light/self.value_sum()
+        return self.light/self.get_overall_sum()
 
     def get_notraffic_portion(self):
-        return self.notraffic/self.value_sum()
+        return self.notraffic/self.get_overall_sum()
 
     def get_noinformation_portion(self):
-        return self.noinformation/self.value_sum()
+        return self.noinformation/self.get_overall_sum()
 
     def __str__(self):
-        return """
-            heavy: {:.0f}%\n
-            moderate: {:.0f}%\n
-            light: {:.0f}%\n
-            notraffic: {:.0f}%\n
-            noinformation: {:.0f}%\n
-            TOTAL: {:.0f}%""".format(
+        return (
+            "heavy: {:.4f}% of total, {:.4f}% of traffic\n"+
+            "moderate: {:.4f}% of total, {:.4f}% of traffic\n"+
+            "light: {:.4f}% of total, {:.4f}% of traffic\n"+
+            "notraffic: {:.4f}% of total, {:.4f}% of traffic\n"+
+            "noinformation: {:.4f}% of total\n"+
+            "TOTAL: {:.4f}%").format(
             self.get_heavy_portion()*100,
+            100*self.heavy/self.get_traffic_sum(),
             self.get_moderate_portion()*100,
+            100*self.moderate/self.get_traffic_sum(),
             self.get_light_portion()*100,
+            100*self.light/self.get_traffic_sum(),
             self.get_notraffic_portion()*100,
-            self.get_noinformation_portion()*100)
+            100*self.notraffic/self.get_traffic_sum(),
+            self.get_noinformation_portion()*100,
+            100*self.get_assigned_sum()/self.get_overall_sum())

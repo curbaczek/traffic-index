@@ -60,59 +60,8 @@ def get_color_classes(image, color_classes=[], threshold=10):
 
     return result
 
-
-"""
 def get_difference_image(src_1, src_2, dest, opacity=0.0):
-
-    img1 = Image.open(src_1)
     img1_rgb = Image.open(src_1).convert('RGB')
-    img2 = Image.open(src_2)
     img2_rgb = Image.open(src_2).convert('RGB')
-
-    diff = ImageChops.difference(img1, img2)
-    diff.save("temp/diff_test_diff_img1_img2.png")
-
     diff = ImageChops.difference(img1_rgb, img2_rgb)
-    diff.save("temp/diff_test_diff_img1_img2_rgb.png")
-
-    diff = ImageChops.difference(img1_rgb, img2_rgb)
-    diff = ImageChops.invert(diff).convert('RGB')
-    diff.save("temp/diff_test_diff_img1_img2_rgb_invert.png")
-
-    # hist = diff.histogram()
-    # print sum(hist)
-
-    img = Image.open("temp/diff_test_diff_img1_img2_rgb_invert.png").convert('RGB')
-    # print img.getpixel((100,100))
-    colors = img.getcolors()
-    # print colors
-
-    diff = ImageChops.subtract(img1, img2)
-    diff.save("temp/diff_test_sub_img1_img2.png")
-
-    diff = ImageChops.subtract(img1_rgb, img2_rgb)
-    diff.save("temp/diff_test_sub_img1_img2_rgb.png")
-
-    diff = ImageChops.subtract(img2, img1)
-    diff.save("temp/diff_test_sub_img2_img1.png")
-
-    diff = ImageChops.subtract(img2_rgb, img1_rgb)
-    diff.save("temp/diff_test_sub_img2_img1_rgb.png")
-
-    # ---
-    diff = ImageChops.difference(b,a)
-    diff = diff.convert('L')
-
-    thresholded_diff = diff
-    for repeat in range(3):
-        thresholded_diff  = ImageChops.add(thresholded_diff, thresholded_diff)
-
-    h,w = size = diff.size
-    mask = new_gray(size, int(255 * (opacity)))
-    shade = new_gray(size, 0)
-    new = a.copy()
-    new.paste(shade, mask=mask)
-    new.paste(b, mask=thresholded_diff)
-    new.save(dest)
-    # ---
-"""
+    ImageChops.invert(diff).convert('RGB').save(dest)

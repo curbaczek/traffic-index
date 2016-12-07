@@ -4,7 +4,7 @@ temp_folder := temp
 
 run_main := python3 traffic_index.py
 run_get_image := python3 get_static_map_image.py
-run_get_traffic := python3 get_static_traffic_map.py
+run_get_traffic := python3 get_static_traffic_analysis.py
 run_quick_tests := ./.quality-checks/pep8.sh
 run_detailed_tests := ./.quality-checks/pep8-detailed.sh
 
@@ -26,7 +26,10 @@ karlsruhe:
 	$(run_main) --city Karlsruhe --lat 49.0068900 --lng 8.4036530 --zoom 14 --debug --stdout
 
 tile-download:
-	$(run_get_image) --lat 49.0068900 --lng 8.4036530 --zoom 16 --tiles 2 --dest "temp"
+	$(run_get_image) --lat 49.0068900 --lng 8.4036530 --zoom 14 --tiles 2 --dest "temp"
+
+tile-download-hamburg:
+	$(run_get_image) --lat 53.5510850 --lng 9.9936820 --zoom 18 --tiles 2 --dest "temp"
 
 traffic-download:
 	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 14 --tiles 2 --dest "temp"

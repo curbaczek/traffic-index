@@ -1,6 +1,9 @@
 import os
+import pprint
 from PIL import Image
 from lib.bing_tile_handler import BingTileHandler
+from lib.util.image_analysis import get_color_count, get_color_classes
+from lib import model
 
 
 def get_parser():
@@ -42,6 +45,39 @@ if __name__ == "__main__":
     tile_center = traffic_handler.getTileImage(args.lat, args.lng, 0, 0, args.zoom, temp_dir)
     Image.open(tile_center).show()
     print(tile_center)
-    # area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, temp_dir, printProgress=True)
+
+    color_classes = get_color_classes(tile_center, [
+        ("green", (122, 187, 68)),
+        ("dark-green", (98, 168, 69)),
+        ("olive", (150, 180, 122)),
+        ("red", (210, 57, 64)),
+        ("orange", (253, 191, 76)),
+        ("yellow", (244, 236, 87)),
+        ("dark-yellow", (205, 180, 50)),
+        ("black", (0, 0, 0)),
+        ("white", (255, 255, 255)),
+    ], threshold = 25)
+
+    heavy_traffic = color_classes["red"]["count"]
+    moderate_traffic = color_classes["orange"]["count"]
+    light_traffic = color_classes["yellow"]["count"] + color_classes["dark-yellow"]["count"]
+    no_traffic = color_classes["green"]["count"] + color_classes["dark-green"]["count"] + color_classes["olive"]["count"]
+    no_information = color_classes["black"]["count"] + color_classes["white"]["count"]
+    unassigned = color_classes["z-no-class"]["count"]
+
+    traffic_analysis = model.TrafficAnalysis(
+        heavy_traffic,
+        moderate_traffic,
+        light_traffic,
+        no_traffic,
+        no_information,
+        unassigned)
+
+    print("*** color analysis result ***")
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(color_classes)
+
+    print("*** area analysis result ***")
+    print(traffic_analysis)
 
     print("images loaded.")

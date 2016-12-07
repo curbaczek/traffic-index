@@ -1,11 +1,12 @@
 # import math
+import tempfile
 from time import sleep
 
 from lib.tile_handler import TrafficTileHandler
 from lib.util.file import download_file
+from lib.util import image_analysis
 from os.path import join
 from lib.data_handler import get_location_tile_filename
-# from lib.util import image
 
 
 class BingTileHandler(TrafficTileHandler):
@@ -50,22 +51,39 @@ class BingTileHandler(TrafficTileHandler):
     def getTileHeight(self):
         return self.IMAGE_HEIGHT
 
-    def getMapLink(self, lat, lng, zoom, file_type, width, height):
+    def getMapLink(self, lat, lng, zoom, map_type):
         return "{}/{},{}/{}?mapLayer={}&format={}&mapSize={},{}&labelOverlay=hidden&key={}".format(
             "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road",
-            lat, lng, zoom, "TrafficFlow", file_type, width, height, self.BING_API_KEY)
+            lat, lng, zoom, map_type, self.FILE_FORMAT, self.IMAGE_WIDTH, self.IMAGE_HEIGHT, self.BING_API_KEY)
+
+    def download_static_map(self, lat, lng, zoom, map_layer, local_filename):
+        map_link = self.getMapLink(lat, lng, zoom, map_layer)
+        download_file(map_link, local_filename)
+        sleep(self.SLEEP_TIME)
+
+    def download_temporary_static_map(self, lat, lng, zoom):
+        tmp_file = tempfile.NamedTemporaryFile()
+        tmp_file.close()
+        self.download_static_map(lat, lng, zoom, "", tmp_file.name)
+        return tmp_file.name
+
+    def download_temporary_static_traffic_map(self, lat, lng, zoom):
+        tmp_file = tempfile.NamedTemporaryFile()
+        tmp_file.close()
+        self.download_static_map(lat, lng, zoom, "TrafficFlow", tmp_file.name)
+        return tmp_file.name
 
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):
-        map_url = self.getMapLink(lat, lng, zoom, self.FILE_FORMAT, self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
         tile = self.createTile(x, y, zoom)
         tile_filename = join(local_directory, get_location_tile_filename(tile))
-        download_file(map_url, tile_filename)
-        sleep(self.SLEEP_TIME)
+        tmp_static_traffic_map = self.download_temporary_static_traffic_map(lat, lng, zoom)
+        tmp_static_map = self.download_temporary_static_map(lat, lng, zoom)
+        image_analysis.get_difference_image(tmp_static_traffic_map, tmp_static_map, tile_filename)
         return tile_filename
 
     def getTiles(self, lat, lng, zoom, tile_count, local_directory, printProgress=False):
-        for x in range(1-tile_count, tile_count):
+        """for x in range(1-tile_count, tile_count):
             for y in range(1-tile_count, tile_count):
                 if (printProgress):
                     print("load image {:+d}x{:+d}".format(x, y))
-                self.getTileImage(lat, lng, x, y, zoom, local_directory)
+                self.getTileImage(lat, lng, x, y, zoom, local_directory)"""
