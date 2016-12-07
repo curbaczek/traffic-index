@@ -1,3 +1,4 @@
+from __future__ import division
 
 SOURCE_GMAP = 'GMAP'
 SOURCE_BING = 'BING'
@@ -63,37 +64,41 @@ class AreaAnalysis(object):
         self.transit = transit
         self.unassigned = unassigned
 
-    def value_sum(self):
-        return self.roadmap + self.highway + self.manmade + self.nature + self.transit + self.unassigned
+    def get_overall_sum(self):
+        return self.get_assigned_sum() + self.unassigned
+
+    def get_assigned_sum(self):
+        return self.roadmap + self.highway + self.manmade + self.nature + self.transit
 
     def get_roadmap_portion(self):
-        return self.roadmap/self.value_sum()
+        return self.roadmap/self.get_overall_sum()
 
     def get_highway_portion(self):
-        return self.highway/self.value_sum()
+        return self.highway/self.get_overall_sum()
 
     def get_manmade_portion(self):
-        return self.manmade/self.value_sum()
+        return self.manmade/self.get_overall_sum()
 
     def get_nature_portion(self):
-        return self.nature/self.value_sum()
+        return self.nature/self.get_overall_sum()
 
     def get_transit_portion(self):
-        return self.transit/self.value_sum()
+        return self.transit/self.get_overall_sum()
 
     def __str__(self):
-        return """
-            roadmap: {:.0f}%\n
-            highway: {:.0f}%\n
-            man-made: {:.0f}%\n
-            nature: {:.0f}%\n
-            transit: {:.0f}%\n
-            TOTAL: {:.0f}%""".format(
+        return (
+            "roadmap: {:.4f}%\n" +
+            "highway: {:.4f}%\n" +
+            "man-made: {:.4f}%\n" +
+            "nature: {:.4f}%\n" +
+            "transit: {:.4f}%\n" +
+            "TOTAL: {:.4f}%").format(
             self.get_roadmap_portion()*100,
             self.get_highway_portion()*100,
             self.get_manmade_portion()*100,
             self.get_nature_portion()*100,
-            self.get_transit_portion()*100)
+            self.get_transit_portion()*100,
+            100*self.get_assigned_sum()/self.get_overall_sum())
 
 
 class TrafficSnapshot(object):

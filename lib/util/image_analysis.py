@@ -51,99 +51,17 @@ def get_color_classes(image, color_classes=[], threshold=10):
                 }
             })
 
-    if (len(color_counts) > 0):
-        result.update({
-            "z-no-class": {
-                "count": sum_color_count(color_counts),
-                "colors": color_counts
-            }
-        })
+    result.update({
+        "z-no-class": {
+            "count": sum_color_count(color_counts),
+            "colors": color_counts
+        }
+    })
 
     return result
 
 
-""" -------------------------------------- """
-
-
-THRESHOLD = 140  # 100 -> 112%, 170 -> 95%
-
-
-def get_white_color_percent(image_filename):
-    image_file = Image.open(image_filename)
-    image = image_file.convert('L')
-    image = numpy.array(image)
-    image = binarize_array(image, THRESHOLD)
-
-    white_pixels = 0
-    other_pixels = 0
-
-    for i in range(len(image)):
-        for j in range(len(image[0])):
-            if image[i][j] == 255:
-                white_pixels += 1
-            else:
-                other_pixels += 1
-
-    """colors = image.getcolors()
-    white_pixels = 0
-    other_pixels = 0
-    print image
-    for count,color in colors:
-        #if (color[0] == color[1] and color[1] == color[2] and color[0] >= 254):
-        if (color == 255):
-            white_pixels += count
-        else:
-            other_pixels += count"""
-
-    print "white: {}, other: {}".format(white_pixels, other_pixels)
-    return 100*white_pixels/(white_pixels + other_pixels)
-
-
-def binarize_image(img_path, target_path, threshold):
-    """Binarize an image."""
-    """http://stackoverflow.com/a/37497975"""
-    image_file = Image.open(img_path)
-    image = image_file.convert('L')  # convert image to monochrome
-    image = numpy.array(image)
-    image = binarize_array(image, threshold)
-    imsave(target_path, image)
-
-
-def binarize_array(numpy_array, threshold=THRESHOLD):
-    """Binarize a numpy array."""
-    for i in range(len(numpy_array)):
-        for j in range(len(numpy_array[0])):
-            if numpy_array[i][j] > threshold:
-                numpy_array[i][j] = 255
-            else:
-                numpy_array[i][j] = 0
-    return numpy_array
-
-
-def bottom_crop_image(image_filename, bottom_margin):
-    im = Image.open(image_filename)
-    img_width, img_height = im.size
-    im.crop((0, 0, img_width, img_height-bottom_margin)).save(image_filename)
-
-
-def generate_color_to_black_image(image_filename, new_image_filename, search_color):
-    im = Image.open(image_filename).convert('RGB')
-    img_width, img_height = im.size
-    for x in range(img_width):
-        for y in range(img_height):
-            current_color = im.getpixel((x, y))
-            if (current_color == search_color):
-                im.putpixel((x, y), (0, 0, 0))
-    im.save(new_image_filename)
-
-
-def new_gray(size, color):
-    img = Image.new('L', size)
-    dr = ImageDraw.Draw(img)
-    dr.rectangle((0, 0) + size, color)
-    return img
-
-
+"""
 def get_difference_image(src_1, src_2, dest, opacity=0.0):
 
     img1 = Image.open(src_1)
@@ -167,7 +85,7 @@ def get_difference_image(src_1, src_2, dest, opacity=0.0):
     img = Image.open("temp/diff_test_diff_img1_img2_rgb_invert.png").convert('RGB')
     # print img.getpixel((100,100))
     colors = img.getcolors()
-    print colors
+    # print colors
 
     diff = ImageChops.subtract(img1, img2)
     diff.save("temp/diff_test_sub_img1_img2.png")
@@ -181,7 +99,8 @@ def get_difference_image(src_1, src_2, dest, opacity=0.0):
     diff = ImageChops.subtract(img2_rgb, img1_rgb)
     diff.save("temp/diff_test_sub_img2_img1_rgb.png")
 
-    """diff = ImageChops.difference(b,a)
+    # ---
+    diff = ImageChops.difference(b,a)
     diff = diff.convert('L')
 
     thresholded_diff = diff
@@ -194,4 +113,6 @@ def get_difference_image(src_1, src_2, dest, opacity=0.0):
     new = a.copy()
     new.paste(shade, mask=mask)
     new.paste(b, mask=thresholded_diff)
-    new.save(dest)"""
+    new.save(dest)
+    # ---
+"""
