@@ -1,4 +1,3 @@
-import tempfile
 import math
 from time import sleep
 
@@ -106,7 +105,7 @@ class GMapTileHandler(AreaTileHandler):
         return self.IMAGE_HEIGHT - self.IMAGE_BOTTOM_MARGIN
 
     def getMapLink(self, centerLatLng, zoom, file_type, map_style, width, height):
-        return """{}?center={},{}&zoom={}&format={}&maptype=roadmap&style={}&size={}x{}""".format(
+        return "{}?center={},{}&zoom={}&format={}&maptype=roadmap&style={}&size={}x{}".format(
             "https://maps.googleapis.com/maps/api/staticmap",
             centerLatLng.lat, centerLatLng.lng, zoom, file_type, map_style, width, height)
 

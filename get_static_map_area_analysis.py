@@ -1,4 +1,3 @@
-from __future__ import division
 import pprint
 from lib.util.image_analysis import get_color_count, get_color_classes
 from lib import model
@@ -15,9 +14,6 @@ def get_parser():
                         required=True)
     return parser
 
-
-def format_percent(value):
-    return round(value*100*100)/100
 
 if __name__ == "__main__":
 

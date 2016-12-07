@@ -69,17 +69,32 @@ class AreaTileHandler(TileHandler):
 
 class TrafficTileHandler(TileHandler):
 
+    def setHeavyTrafficColor(self, value):
+        self.heavy_traffic_color = value
+
     def getHeavyTrafficColor(self):
         return self.heavy_traffic_color
+
+    def setModerateTrafficColor(self, value):
+        self.moderate_traffic_color = value
 
     def getModerateTrafficColor(self):
         return self.moderate_traffic_color
 
+    def setLightTrafficColor(self, value):
+        self.light_traffic_color = value
+
     def getLightTrafficColor(self):
         return self.light_traffic_color
 
+    def setNoTrafficColor(self, value):
+        self.no_traffic_color = value
+
     def getNoTrafficColor(self):
         return self.no_traffic_color
+
+    def setNoInformationColor(self, value):
+        self.noinformation_traffic_color = value
 
     def getNoInformationTrafficColor(self):
         return self.noinformation_traffic_color
