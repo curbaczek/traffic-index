@@ -71,8 +71,13 @@ class GMapTileHandler(AreaTileHandler):
 
     FILE_FORMAT = "PNG"
 
+    """
+    Maximum size in free version is 640x640px, image scale is allowed to increase
+    accuracy. The resulting image is scale * image size, so maximum of 1280x1280
+    """
     IMAGE_WIDTH = 640
     IMAGE_HEIGHT = 640
+    IMAGE_SCALE = 2
     IMAGE_BOTTOM_MARGIN = 22
 
     SLEEP_TIME = 2
@@ -99,15 +104,16 @@ class GMapTileHandler(AreaTileHandler):
         return self.DATA_SRC
 
     def getTileWidth(self):
-        return self.IMAGE_WIDTH
+        return self.IMAGE_WIDTH * self.IMAGE_SCALE
 
     def getTileHeight(self):
-        return self.IMAGE_HEIGHT - self.IMAGE_BOTTOM_MARGIN
+        return (self.IMAGE_HEIGHT - self.IMAGE_BOTTOM_MARGIN) * self.IMAGE_SCALE
 
-    def getMapLink(self, centerLatLng, zoom, file_type, map_style, width, height):
-        return "{}?center={},{}&zoom={}&format={}&maptype=roadmap&style={}&size={}x{}".format(
+    def getMapLink(self, centerLatLng, zoom, map_style):
+        return "{}?center={},{}&zoom={}&format={}&maptype=roadmap&style={}&size={}x{}&scale={}".format(
             "https://maps.googleapis.com/maps/api/staticmap",
-            centerLatLng.lat, centerLatLng.lng, zoom, file_type, map_style, width, height)
+            centerLatLng.lat, centerLatLng.lng, zoom, self.FILE_FORMAT, map_style,
+            self.IMAGE_WIDTH, self.IMAGE_HEIGHT, self.IMAGE_SCALE)
 
     def getMapCenter(self, lat, lng, zoom, tile_x, tile_y):
         """ calculates the new map center with the given tile offset """
@@ -116,8 +122,8 @@ class GMapTileHandler(AreaTileHandler):
         proj = MercatorProjection()
         centerPoint = proj.fromLatLngToPoint(G_LatLng(lat, lng))
         newCenterPoint = G_Point(
-            centerPoint.x + (tile_x * self.getTileWidth()) / scale,
-            centerPoint.y + (tile_y * self.getTileHeight()) / scale)
+            centerPoint.x + (tile_x * self.IMAGE_WIDTH) / scale,
+            centerPoint.y + (tile_y * (self.IMAGE_HEIGHT - self.IMAGE_BOTTOM_MARGIN)) / scale)
         return proj.fromPointToLatLng(newCenterPoint)
 
     def getMapStyle(self):
@@ -140,11 +146,11 @@ class GMapTileHandler(AreaTileHandler):
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):
         tileCenter = self.getMapCenter(lat, lng, zoom, x, y)
         map_style = self.getMapStyle()
-        map_url = self.getMapLink(tileCenter, zoom, self.FILE_FORMAT, map_style, self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
+        map_url = self.getMapLink(tileCenter, zoom, map_style)
         tile = self.createTile(x, y, zoom)
         tile_filename = join(local_directory, get_location_tile_filename(tile))
         download_file(map_url, tile_filename)
-        image.bottom_crop_image(tile_filename, self.IMAGE_BOTTOM_MARGIN)
+        image.bottom_crop_image(tile_filename, self.IMAGE_BOTTOM_MARGIN * self.IMAGE_SCALE)
         sleep(self.SLEEP_TIME)
         return tile_filename
 
