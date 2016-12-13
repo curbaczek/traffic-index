@@ -1,0 +1,122 @@
+% Vorlage für eine Bachelorarbeit
+% Siehe auch LaTeX-Kurs von Mathematik-Online
+% www.mathematik-online.org/kurse
+% Anpassungen für die Fakultät für Mathematik
+% am KIT durch Klaus Spitzmüller und Roland Schnaubelt Dezember 2011
+
+\documentclass[12pt,a4paper]{scrartcl}
+% scrartcl ist eine abgeleitete Artikel-Klasse im Koma-Skript
+% zur Kontrolle des Umbruchs Klassenoption draft verwenden
+
+
+% die folgenden Packete erlauben den Gebrauch von Umlauten und ß
+% in der Latex Datei
+\usepackage[utf8]{inputenc}
+% \usepackage[latin1]{inputenc} %  Alternativ unter Windows
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{latexsym}
+\usepackage{amsmath,amssymb,amsthm}
+
+
+% Abstand obere Blattkante zur Kopfzeile ist 2.54cm - 15mm
+\setlength{\topmargin}{-15mm}
+
+
+\begin{document}
+  % Keine Seitenzahlen im Vorspann
+  \pagestyle{empty}
+
+  % Titelblatt der Arbeit
+  \begin{titlepage}
+
+    \includegraphics[scale=0.45]{kit-logo.jpg} 
+    \vspace*{2cm} 
+
+ \begin{center} \large 
+    
+    Seminararbeit
+    \vspace*{2cm}
+
+    {\huge Stauindex}
+    \vspace*{2.5cm}
+
+    Markus Scherer\\
+    Christof Urbaczek\\
+    Nils Hennemann
+    
+    \vspace*{1.5cm}
+
+    Datum der Abgabe
+    \vspace*{4.5cm}
+
+
+    Betreuung: Dr.-Ing. Bastian Chlond \\[1cm]
+    Fakultät für Bauingenieurwesen \\[1cm]
+		Karlsruher Institut für Technologie
+  \end{center}
+\end{titlepage}
+
+
+
+  % Inhaltsverzeichnis
+  \tableofcontents
+
+\newpage
+ 
+
+
+  % Ab sofort Seitenzahlen in der Kopfzeile anzeigen
+  \pagestyle{headings}
+
+\section{Einleitung}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ \newpage  % neuer Abschnitt auf neue Seite, kann auch entfallen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+\section{Technische Umsetzung}
+\newpage
+\section{Datenauswertung}
+\subsection{Städtebauliche Analyse}
+\subsection{Verkehrliche Analyse}
+\newpage
+\section{Fazit und Ausblick}
+
+  % Literaturverzeichnis (beginnt auf einer ungeraden Seite)
+  \newpage
+
+\begin{thebibliography}{Lam00}
+ 
+\end{thebibliography}
+ 
+      
+  % ggf. hier Tabelle mit Symbolen 
+  % (kann auch auf das Inhaltsverzeichnis folgen)
+
+\newpage
+  
+ \thispagestyle{empty}
+
+
+\vspace*{8cm}
+
+
+\section*{Erklärung}
+
+Hiermit versichere ich, dass ich diese Arbeit selbständig verfasst und keine anderen, als die angegebenen Quellen und Hilfsmittel benutzt, die wörtlich oder inhaltlich übernommenen Stellen als solche kenntlich gemacht und die Satzung des Karlsruher Instituts für Technologie zur Sicherung guter wissenschaftlicher Praxis in der jeweils gültigen Fassung beachtet habe. \\[2ex] 
+
+\noindent
+Ort, den Datum\\[5ex]
+
+% Unterschrift (handgeschrieben)
+
+
+
+\end{document}
+
