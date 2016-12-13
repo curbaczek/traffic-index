@@ -146,11 +146,11 @@ class TrafficAnalysis(object):
 
     def __str__(self):
         return (
-            "heavy: {:.4f}% of total, {:.4f}% of traffic\n"+
-            "moderate: {:.4f}% of total, {:.4f}% of traffic\n"+
-            "light: {:.4f}% of total, {:.4f}% of traffic\n"+
-            "notraffic: {:.4f}% of total, {:.4f}% of traffic\n"+
-            "noinformation: {:.4f}% of total\n"+
+            "heavy: {:.4f}% of total, {:.4f}% of traffic\n" +
+            "moderate: {:.4f}% of total, {:.4f}% of traffic\n" +
+            "light: {:.4f}% of total, {:.4f}% of traffic\n" +
+            "notraffic: {:.4f}% of total, {:.4f}% of traffic\n" +
+            "noinformation: {:.4f}% of total\n" +
             "TOTAL: {:.4f}%").format(
             self.get_heavy_portion()*100,
             100*self.heavy/self.get_traffic_sum(),

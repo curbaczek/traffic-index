@@ -35,6 +35,14 @@ def get_parser():
     return parser
 
 
+def get_color_class_sum(color_class_result, colors):
+    result = 0
+    for color in color_class_result:
+        if color in colors:
+            result += color_class_result[color]["count"]
+    return result
+
+
 if __name__ == "__main__":
     args = get_parser().parse_args()
     traffic_handler = BingTileHandler()
@@ -56,14 +64,14 @@ if __name__ == "__main__":
         ("dark-yellow", (205, 180, 50)),
         ("black", (0, 0, 0)),
         ("white", (255, 255, 255)),
-    ], threshold = 25)
+    ], threshold=25)
 
-    heavy_traffic = color_classes["red"]["count"]
-    moderate_traffic = color_classes["orange"]["count"]
-    light_traffic = color_classes["yellow"]["count"] + color_classes["dark-yellow"]["count"]
-    no_traffic = color_classes["green"]["count"] + color_classes["dark-green"]["count"] + color_classes["olive"]["count"]
-    no_information = color_classes["black"]["count"] + color_classes["white"]["count"]
-    unassigned = color_classes["z-no-class"]["count"]
+    heavy_traffic = get_color_class_sum(color_classes, ["red"])
+    moderate_traffic = get_color_class_sum(color_classes, ["orange"])
+    light_traffic = get_color_class_sum(color_classes, ["yellow", "dark-yellow"])
+    no_traffic = get_color_class_sum(color_classes, ["green", "dark-green", "olive"])
+    no_information = get_color_class_sum(color_classes, ["black", "white"])
+    unassigned = get_color_class_sum(color_classes, ["z-no-class"])
 
     traffic_analysis = model.TrafficAnalysis(
         heavy_traffic,

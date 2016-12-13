@@ -31,6 +31,5 @@ tile-download:
 tile-download-hamburg:
 	$(run_get_image) --lat 53.5510850 --lng 9.9936820 --zoom 18 --tiles 2 --dest "temp"
 
-traffic-download:
-	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 14 --tiles 2 --dest "temp"
-
+traffic-analysis:
+	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 14 --tiles 1 --dest "temp"

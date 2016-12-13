@@ -60,6 +60,7 @@ def get_color_classes(image, color_classes=[], threshold=10):
 
     return result
 
+
 def get_difference_image(src_1, src_2, dest, opacity=0.0):
     img1_rgb = Image.open(src_1).convert('RGB')
     img2_rgb = Image.open(src_2).convert('RGB')
