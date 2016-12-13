@@ -120,11 +120,11 @@ if __name__ == "__main__":
 
     print("*** full color analysis result ***")
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(color_classes)
+    # pp.pprint(color_classes)
 
     print("*** unknown color analysis result ***")
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(color_classes["unknown"])
+    # pp.pprint(color_classes["unknown"])
 
     print("*** area analysis result ***")
     print(traffic_analysis)

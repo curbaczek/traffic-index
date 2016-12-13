@@ -5,6 +5,8 @@ from lib import model
 
 class TileHandler(ABC):
 
+    debug_mode = False
+
     @abstractmethod
     def getFileFormat(self):
         pass
@@ -24,6 +26,19 @@ class TileHandler(ABC):
     def createTile(self, x, y, zoom):
         current_time = int(time.time())
         return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat())
+
+    def setDebugMode(self, value):
+        self.debug_mode = bool(value)
+
+    def isDebugMode(self):
+        return self.debug_mode
+
+    def printDebugMsg(self, msg):
+        if (self.isDebugMode()):
+            print("[Debug] {}".format(msg))
+
+    def printIndentedDebugMsg(self, msg):
+        self.printDebugMsg("--- {}".format(msg))
 
     @abstractmethod
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):

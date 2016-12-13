@@ -1,6 +1,9 @@
 import os
 from PIL import Image
 from lib.gmap_tile_handler import GMapTileHandler
+from lib import data_handler
+
+LOCATION_DIR = "res/data/locations"
 
 
 def get_parser():
@@ -21,36 +24,34 @@ def get_parser():
                         required=True)
     parser.add_argument('--tiles',
                         type=int,
-                        help="number of tiles taken around the center one",
+                        help="number of tiles taken around the center one, (2n-1)² images will be generated, " +
+                        "(8n-8) more than the previous tile level",
                         dest='tile_count',
                         required=True)
     parser.add_argument('--dest',
                         type=str,
                         help="dir to save the images",
+                        default="",
                         dest='dest_dir',
-                        required=True)
+                        required=False)
     return parser
+
+
+def get_target_directory(args):
+    latlng_dir = "{},{}".format(args.lat, args.lng)
+    location_dir = os.path.join(LOCATION_DIR, latlng_dir, data_handler.SUBDIR_TILES)
+    return location_dir if (args.dest_dir == "") else args.dest_dir
 
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
+
+    target_dir = get_target_directory(args)
+    print("set target directory '{}'".format(target_dir))
+    os.makedirs(target_dir, exist_ok=True)
+
     area_handler = GMapTileHandler()
+    area_handler.setDebugMode(True)
+    tile_list = area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
 
-    temp_dir = args.dest_dir
-    os.makedirs(temp_dir, exist_ok=True)
-
-    tile_center = area_handler.getTileImage(args.lat, args.lng, 0, 0, args.zoom, temp_dir)
-    Image.open(tile_center).show()
-    print(tile_center)
-    """
-    tile_center = area_handler.getTileImage(args.lat, args.lng, -1, 0, args.zoom, temp_dir)
-    Image.open(tile_center).show()
-    print(tile_center)
-    tile_center = area_handler.getTileImage(args.lat, args.lng, 0, 1, args.zoom, temp_dir)
-    Image.open(tile_center).show()
-    print(tile_center)
-    """
-
-    # area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, temp_dir, printProgress=True)
-
-    print("images loaded.")
+    print("all images loaded in target directory")

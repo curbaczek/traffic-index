@@ -4,7 +4,8 @@ from time import sleep
 from lib.tile_handler import AreaTileHandler
 from lib.util.file import download_file
 from os.path import join
-from lib.data_handler import get_location_tile_filename
+from lib.data_handler import get_location_tile_filename_from_tile
+from lib.data_handler import get_latest_location_tile
 from lib.util import image
 
 MERCATOR_RANGE = 256
@@ -143,20 +144,35 @@ class GMapTileHandler(AreaTileHandler):
             self.getNaturalAreaColor(),
             self.getTransitAreaColor())
 
+    def getLatestLocationTile(self, tile, directory):
+        latest_tile = get_latest_location_tile(
+            directory, tile.x, tile.y, self.getDataSource(), tile.zoom, self.getFileFormat())
+        if (latest_tile is None):
+            self.printIndentedDebugMsg("no local file found")
+        else:
+            self.printIndentedDebugMsg("tile '{}' found, download skipped".format(latest_tile))
+        return latest_tile
+
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):
+        self.printDebugMsg("load image {:+d}x{:+d}".format(x, y))
         tileCenter = self.getMapCenter(lat, lng, zoom, x, y)
         map_style = self.getMapStyle()
         map_url = self.getMapLink(tileCenter, zoom, map_style)
+
         tile = self.createTile(x, y, zoom)
-        tile_filename = join(local_directory, get_location_tile_filename(tile))
-        download_file(map_url, tile_filename)
-        image.bottom_crop_image(tile_filename, self.IMAGE_BOTTOM_MARGIN * self.IMAGE_SCALE)
-        sleep(self.SLEEP_TIME)
+        tile_filename = self.getLatestLocationTile(tile, local_directory)
+        if (tile_filename is None):
+            tile_filename = join(local_directory, get_location_tile_filename_from_tile(tile))
+            download_file(map_url, tile_filename)
+            image.bottom_crop_image(tile_filename, self.IMAGE_BOTTOM_MARGIN * self.IMAGE_SCALE)
+            self.printIndentedDebugMsg("new tile downloaded")
+            sleep(self.SLEEP_TIME)
         return tile_filename
 
-    def getTiles(self, lat, lng, zoom, tile_count, local_directory, printProgress=False):
+    def getTiles(self, lat, lng, zoom, tile_count, local_directory):
+        tile_list = []
         for x in range(1-tile_count, tile_count):
             for y in range(1-tile_count, tile_count):
-                if (printProgress):
-                    print("load image {:+d}x{:+d}".format(x, y))
-                self.getTileImage(lat, lng, x, y, zoom, local_directory)
+                new_tile = self.getTileImage(lat, lng, x, y, zoom, local_directory)
+                tile_list.append(new_tile)
+        return tile_list
