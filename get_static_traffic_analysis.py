@@ -10,28 +10,25 @@ def get_parser():
     from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
     parser = ArgumentParser(description=__doc__,
                             formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-i", "--input",
+                        dest="input",
+                        help="read this file",
+                        metavar="FILE")
     parser.add_argument('--lat',
                         type=str,
-                        help="latitude of the city",
-                        required=True)
+                        help="latitude of the city")
     parser.add_argument('--lng',
                         type=str,
-                        help="longitude of the city",
-                        required=True)
+                        help="longitude of the city")
     parser.add_argument('--zoom',
                         type=int,
-                        help="zoom level to analyse",
-                        required=True)
-    parser.add_argument('--tiles',
-                        type=int,
-                        help="number of tiles taken around the center one",
-                        dest='tile_count',
-                        required=True)
+                        default=14,
+                        help="zoom level to analyse")
     parser.add_argument('--dest',
                         type=str,
+                        default="temp",
                         help="dir to save the images",
-                        dest='dest_dir',
-                        required=True)
+                        dest='dest_dir')
     return parser
 
 
@@ -47,31 +44,69 @@ if __name__ == "__main__":
     args = get_parser().parse_args()
     traffic_handler = BingTileHandler()
 
-    temp_dir = args.dest_dir
-    os.makedirs(temp_dir, exist_ok=True)
+    if (args.input == ""):
 
-    tile_center = traffic_handler.getTileImage(args.lat, args.lng, 0, 0, args.zoom, temp_dir)
-    Image.open(tile_center).show()
-    print(tile_center)
+        temp_dir = args.dest_dir
+        os.makedirs(temp_dir, exist_ok=True)
+
+        if (args.lat == ""):
+            print("[WARNING] latitude value should be set")
+        if (args.lng == ""):
+            print("[WARNING] longitude value should be set")
+
+        tile_center = traffic_handler.getTileImage(args.lat, args.lng, 0, 0, args.zoom, temp_dir)
+        Image.open(tile_center).show()
+        print("loaded new image: {}".format(tile_center))
+
+    else:
+
+        tile_center = args.input
+        print("loaded saved image: {}".format(tile_center))
+
+    (img_width, img_height) = Image.open(tile_center).size
 
     color_classes = get_color_classes(tile_center, [
-        ("green", (122, 187, 68)),
-        ("dark-green", (98, 168, 69)),
-        ("olive", (150, 180, 122)),
-        ("red", (210, 57, 64)),
-        ("orange", (253, 191, 76)),
+        ("green", (125, 190, 25)),
+        ("green", (125, 190, 75)),
+        ("green", (125, 190, 125)),
+        ("green", (154, 205, 50)),
+        ("green", (154, 205, 100)),
+        ("green", (100, 170, 75)),
+        ("green", (150, 180, 122)),
+        ("green", (170, 255, 25)),
+        ("green", (170, 255, 75)),
+        ("green", (170, 255, 100)),
+        ("green", (170, 255, 150)),
+        ("green", (170, 215, 25)),
+        ("green", (170, 215, 75)),
+        ("green", (170, 215, 100)),
+        ("green", (170, 215, 150)),
+        ("green", (205, 255, 100)),
+        ("green", (205, 255, 150)),
+        ("green", (205, 255, 200)),
+        ("red", (210, 80, 70)),
+        ("red", (210, 100, 70)),
+        ("orange", (230, 200, 75)),
+        ("orange", (230, 200, 125)),
+        ("orange", (230, 200, 160)),
         ("yellow", (244, 236, 87)),
-        ("dark-yellow", (205, 180, 50)),
+        ("yellow", (205, 180, 50)),
+        ("yellow", (255, 255, 25)),
+        ("yellow", (255, 255, 75)),
+        ("yellow", (255, 255, 125)),
+        ("yellow", (255, 255, 175)),
+        ("yellow", (255, 255, 200)),
+        ("yellow", (255, 255, 210)),
         ("black", (0, 0, 0)),
         ("white", (255, 255, 255)),
     ], threshold=25)
 
-    heavy_traffic = get_color_class_sum(color_classes, ["red"])
-    moderate_traffic = get_color_class_sum(color_classes, ["orange"])
-    light_traffic = get_color_class_sum(color_classes, ["yellow", "dark-yellow"])
-    no_traffic = get_color_class_sum(color_classes, ["green", "dark-green", "olive"])
-    no_information = get_color_class_sum(color_classes, ["black", "white"])
-    unassigned = get_color_class_sum(color_classes, ["z-no-class"])
+    heavy_traffic = color_classes["red"]["count"]
+    moderate_traffic = color_classes["orange"]["count"]
+    light_traffic = color_classes["yellow"]["count"]
+    no_traffic = color_classes["green"]["count"]
+    no_information = color_classes["black"]["count"] + color_classes["white"]["count"]
+    unassigned = color_classes["unknown"]["count"]
 
     traffic_analysis = model.TrafficAnalysis(
         heavy_traffic,
@@ -81,9 +116,15 @@ if __name__ == "__main__":
         no_information,
         unassigned)
 
-    print("*** color analysis result ***")
+    assert traffic_analysis.get_overall_sum() == img_width * img_height
+
+    print("*** full color analysis result ***")
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(color_classes)
+
+    print("*** unknown color analysis result ***")
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(color_classes["unknown"])
 
     print("*** area analysis result ***")
     print(traffic_analysis)

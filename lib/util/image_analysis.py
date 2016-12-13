@@ -29,10 +29,13 @@ def get_color_classes(image, color_classes=[], threshold=10):
 
     if (len(color_classes) > 0):
         for color_class_definition in color_classes:
+
             filtered_color_count = []
             matched_colors = []
+
             class_name = color_class_definition[0]
             class_color = color_class_definition[1]
+
             for color, count in color_counts:
                 if (
                     color[0] in range(class_color[0]-threshold, class_color[0]+threshold) and
@@ -42,17 +45,22 @@ def get_color_classes(image, color_classes=[], threshold=10):
                     matched_colors.append((color, count))
                 else:
                     filtered_color_count.append((color, count))
+
             color_counts = filtered_color_count
-            result.update({
-                class_name: {
-                    "seed": class_color,
-                    "count": sum_color_count(matched_colors),
-                    "colors": matched_colors
-                }
-            })
+
+            if class_name in result:
+                result[class_name]["colors"] += matched_colors
+                result[class_name]["count"] += sum_color_count(matched_colors)
+            else:
+                result.update({
+                    class_name: {
+                        "count": sum_color_count(matched_colors),
+                        "colors": matched_colors
+                    }
+                })
 
     result.update({
-        "z-no-class": {
+        "unknown": {
             "count": sum_color_count(color_counts),
             "colors": color_counts
         }

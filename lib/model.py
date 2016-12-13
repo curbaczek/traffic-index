@@ -146,19 +146,25 @@ class TrafficAnalysis(object):
 
     def __str__(self):
         return (
-            "heavy: {:.4f}% of total, {:.4f}% of traffic\n" +
-            "moderate: {:.4f}% of total, {:.4f}% of traffic\n" +
-            "light: {:.4f}% of total, {:.4f}% of traffic\n" +
-            "notraffic: {:.4f}% of total, {:.4f}% of traffic\n" +
-            "noinformation: {:.4f}% of total\n" +
-            "TOTAL: {:.4f}%").format(
+            "heavy: {}px, {:.4f}% of total, {:.4f}% of traffic\n" +
+            "moderate: {}px, {:.4f}% of total, {:.4f}% of traffic\n" +
+            "light: {}px, {:.4f}% of total, {:.4f}% of traffic\n" +
+            "notraffic: {}px, {:.4f}% of total, {:.4f}% of traffic\n" +
+            "noinformation: {}px, {:.4f}% of total\n" +
+            "TOTAL: {:.4f}%, unassigned {}px").format(
+            self.heavy,
             self.get_heavy_portion()*100,
             100*self.heavy/self.get_traffic_sum(),
+            self.moderate,
             self.get_moderate_portion()*100,
             100*self.moderate/self.get_traffic_sum(),
+            self.light,
             self.get_light_portion()*100,
             100*self.light/self.get_traffic_sum(),
+            self.notraffic,
             self.get_notraffic_portion()*100,
             100*self.notraffic/self.get_traffic_sum(),
+            self.noinformation,
             self.get_noinformation_portion()*100,
-            100*self.get_assigned_sum()/self.get_overall_sum())
+            100*self.get_assigned_sum()/self.get_overall_sum(),
+            self.unassigned)

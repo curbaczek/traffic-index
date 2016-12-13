@@ -33,7 +33,7 @@ if __name__ == "__main__":
         color_classes["blue"]["count"],
         color_classes["white"]["count"],
         color_classes["black"]["count"],
-        color_classes["z-no-class"]["count"])
+        color_classes["unknown"]["count"])
 
     print("*** color analysis result ***")
     pp = pprint.PrettyPrinter(indent=4)
