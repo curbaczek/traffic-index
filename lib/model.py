@@ -91,14 +91,12 @@ class AreaAnalysis(object):
             "highway: {:.4f}%\n" +
             "man-made: {:.4f}%\n" +
             "nature: {:.4f}%\n" +
-            "transit: {:.4f}%\n" +
-            "TOTAL: {:.4f}%").format(
+            "transit: {:.4f}%").format(
             self.get_roadmap_portion()*100,
             self.get_highway_portion()*100,
             self.get_manmade_portion()*100,
             self.get_nature_portion()*100,
-            self.get_transit_portion()*100,
-            100*self.get_assigned_sum()/self.get_overall_sum())
+            self.get_transit_portion()*100)
 
 
 class TrafficSnapshot(object):
