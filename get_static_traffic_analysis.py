@@ -13,7 +13,9 @@ def get_parser():
     parser.add_argument("-i", "--input",
                         dest="input",
                         help="read this file",
-                        metavar="FILE")
+                        metavar="FILE",
+                        default="",
+                        required=False)
     parser.add_argument('--lat',
                         type=str,
                         help="latitude of the city")
@@ -41,6 +43,7 @@ def get_color_class_sum(color_class_result, colors):
 
 
 if __name__ == "__main__":
+
     args = get_parser().parse_args()
     traffic_handler = BingTileHandler()
 
