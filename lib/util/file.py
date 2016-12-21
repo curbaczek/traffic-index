@@ -27,3 +27,8 @@ def copy_file_makedirs(src, dst):
 
 def download_file(url, local_filename):
     urllib.request.urlretrieve(url, local_filename)
+
+
+def remove_file(filename):
+    if (os.path.isfile(filename)):
+        os.remove(filename)

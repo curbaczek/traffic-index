@@ -85,6 +85,9 @@ class AreaAnalysis(object):
     def get_transit_portion(self):
         return self.transit/self.get_overall_sum()
 
+    def get_unassigned_portion(self):
+        return self.unassigned/self.get_overall_sum()
+
     def __str__(self):
         return (
             "roadmap: {:.4f}%\n" +
