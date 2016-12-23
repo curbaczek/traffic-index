@@ -6,7 +6,7 @@ from lib.tile_handler import TrafficTileHandler
 from lib.util.file import download_file
 from lib.util import image_analysis
 from os.path import join
-from lib.data_handler import get_location_tile_filename
+from lib.data_handler import get_location_tile_filename_from_tile
 
 
 class BingTileHandler(TrafficTileHandler):
@@ -75,7 +75,7 @@ class BingTileHandler(TrafficTileHandler):
 
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):
         tile = self.createTile(x, y, zoom)
-        tile_filename = join(local_directory, get_location_tile_filename(tile))
+        tile_filename = join(local_directory, get_location_tile_filename_from_tile(tile))
         tmp_static_traffic_map = self.download_temporary_static_traffic_map(lat, lng, zoom)
         tmp_static_map = self.download_temporary_static_map(lat, lng, zoom)
         image_analysis.get_difference_image(tmp_static_traffic_map, tmp_static_map, tile_filename)

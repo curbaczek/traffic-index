@@ -8,6 +8,8 @@ from lib import data_handler
 from lib import model
 from lib.data_handler import get_location_tile
 from lib.gmap_tile_handler import GMapTileHandler
+from lib.csv_handler import write_csv_data
+from lib.util.file import remove_file
 from lib.util.image_analysis import get_color_count, get_color_classes
 
 LOCATION_DIR = "res/data/locations"
@@ -41,6 +43,12 @@ def get_parser():
                         default="",
                         dest='dest_dir',
                         required=False)
+    parser.add_argument('--csv',
+                        type=str,
+                        help="file to save the analysis results as csv",
+                        default="",
+                        dest='csv_out',
+                        required=False)
     parser.add_argument('--show_color_result',
                         help="shows the complete color result with all counts",
                         action='store_true')
@@ -60,8 +68,42 @@ def get_target_directory(args):
     return location_dir if (args.dest_dir == "") else args.dest_dir
 
 
+def write_csv_headline(filename):
+    write_csv_data(filename, [
+        'x', 'y', 'roadmap_portion', 'highway_portion', 'manmade_portion',
+        'nature_portion', 'transit_portion', 'unassigned_portion', 'roadmap_absolute',
+        'highway_absolute', 'manmade_absolute', 'nature_absolute', 'transit_absolute',
+        'duration [ms]'])
+
+
+def write_analysis_result(filename, tile, analysis_result, duration):
+    write_csv_data(filename, [
+        tile.x, tile.y,
+        analysis_result.get_roadmap_portion()*100,
+        analysis_result.get_highway_portion()*100,
+        analysis_result.get_manmade_portion()*100,
+        analysis_result.get_nature_portion()*100,
+        analysis_result.get_transit_portion()*100,
+        analysis_result.get_unassigned_portion()*100,
+        analysis_result.roadmap,
+        analysis_result.highway,
+        analysis_result.manmade,
+        analysis_result.nature,
+        analysis_result.transit,
+        analysis_result.unassigned,
+        duration])
+
+
 if __name__ == "__main__":
+
     args = get_parser().parse_args()
+
+    csv_file = args.csv_out
+    save_csv_result = False
+    if (csv_file != ""):
+        save_csv_result = True
+        remove_file(csv_file)
+        write_csv_headline(csv_file)
 
     print("*** download area tiles ***")
 
@@ -132,7 +174,11 @@ if __name__ == "__main__":
             pp.pprint(color_result["unknown"])
 
         print(area_analysis)
-        print("execution time: {:4f} ms".format(1000*(end_time - start_time)))
+        executiontime = 1000*(end_time - start_time)
+        print("execution time: {:4f} ms".format(executiontime))
+
+        if (save_csv_result):
+            write_analysis_result(csv_file, tile, area_analysis, executiontime)
 
     overall_end_time = time.time()
 
@@ -143,3 +189,6 @@ if __name__ == "__main__":
     print("*** overall analysis ***")
     print(overall_area_analysis)
     print("total execution time: {:4f} ms".format(1000*(overall_end_time - overall_start_time)))
+
+    if (save_csv_result):
+        print("area analysis results saved to {}".format(csv_file))
