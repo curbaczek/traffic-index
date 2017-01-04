@@ -1,5 +1,13 @@
 # traffic-index
-Script to analyse cities' traffic situation over a period of time and calculate an index to allow comparability
+Deutsch:
+Studentische Seminararbeit im Rahmen des Seminar Verkehrswesen am Institut für Verkehrswesen, Karlsruher Institut für Technologie. Ziel dieser Arbeit ist es, aus den Verkehrsinformationen von öffentlich zugänglichen Kartendiensten, einen "Stauindex" zu bilden,
+um eine zeitliche und räumliche Vergleichbarkeit des Verkhrssituation in verschiedenen Städten herzustellen. Außerdem werden die wesentlichen Bodebedeckungsdaten aus der Karte extrahiert, um Zusammenhänge zwischen der Stadtstruktur und dem berechneten Index zu ermitteln.
+Diese Arbeit stellt eine erste "Machbarkeitsstudie" dar und untersucht mögliche Vorgehensweisen und Beschränkungen bei der Umsetzung.      
+
+English:
+Student seminar reserach project at the Institute for traffic engineering at Karlsruhe Institute of Technology to analyse traffic information from  publicly available map services and turn them into an index for spatial and chronological comparison.
+In addition land cover data will be extracted from the maps to show correlations between city structure and traffic situation.
+This project is mainly a feasibility study, to look for limitations and possible solutions.
 
 # Setup
 
