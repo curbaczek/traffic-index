@@ -61,10 +61,14 @@ def get_parser():
     parser.add_argument('--show_grid_image',
                         help="generates and shows the grid image of the current tile map",
                         action='store_true')
+    parser.add_argument('--show_detailed_analysis',
+                        help="shows the area analysis of every tile",
+                        action='store_true')
 
     parser.set_defaults(show_color_result=False)
     parser.set_defaults(show_unknown_colors=False)
     parser.set_defaults(show_grid_image=False)
+    parser.set_defaults(show_detailed_analysis=False)
 
     return parser
 
@@ -145,7 +149,8 @@ if __name__ == "__main__":
         tile = get_location_tile(file_name)
         file_path = os.path.join(target_dir, file_name)
 
-        print("*** analyse area {:+d}x{:+d} ***".format(tile.x, tile.y))
+        if args.show_detailed_analysis:
+            print("*** analyse area {:+d}x{:+d} ***".format(tile.x, tile.y))
 
         start_time = time.time()
         color_result = get_color_classes(file_path, color_definitions, threshold=color_threshold)
@@ -169,19 +174,21 @@ if __name__ == "__main__":
         overall_transit += analysis_transit
         overall_unassigned += analysis_unassigned
 
-        if (args.show_color_result):
+        if args.show_color_result and args.show_detailed_analysis:
             print("--- color result")
             pp = pprint.PrettyPrinter(indent=4)
             pp.pprint(color_result)
 
-        if (args.show_unknown_colors):
+        if args.show_unknown_colors and args.show_detailed_analysis:
             print("--- unknown color result")
             pp = pprint.PrettyPrinter(indent=4)
             pp.pprint(color_result["unknown"])
 
-        print(area_analysis)
         executiontime = 1000*(end_time - start_time)
-        print("execution time: {:4f} ms".format(executiontime))
+
+        if args.show_detailed_analysis:
+            print(area_analysis)
+            print("execution time: {:4f} ms".format(executiontime))
 
         if (save_csv_result):
             write_analysis_result(csv_file, tile, area_analysis, executiontime)
