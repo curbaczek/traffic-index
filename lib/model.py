@@ -1,5 +1,10 @@
 from __future__ import division
 
+import os
+
+from lib import data_handler
+from lib.util.image import generate_grid_image
+
 SOURCE_GMAP = 'GMAP'
 SOURCE_BING = 'BING'
 
@@ -19,18 +24,48 @@ class Location(object):
 class TileMap(object):
 
     def __init__(self):
+        self.resetTiles()
+
+    def resetTiles(self):
         self.tiles = []
+        self.minX = 0
+        self.maxX = 0
+        self.minY = 0
+        self.maxY = 0
 
     def setTiles(self, tiles):
-        self.tiles = tiles
+        self.resetTiles()
+        for tile in tiles:
+            self.appendTile(tile)
 
     def appendTile(self, tile):
+        if (tile.x < self.minX):
+            self.minX = tile.x
+        if (tile.x > self.minX):
+            self.maxX = tile.x
+        if (tile.y < self.minY):
+            self.minY = tile.y
+        if (tile.y > self.maxY):
+            self.maxY = tile.y
         self.tiles.append(tile)
 
     # TODO
     # def getActiveTiles(self):
     # def getTraffic...
     # def __str__(self):
+
+    def saveTileMapImage(self, filename, tile_directory):
+        index_shift_x = abs(self.minX)
+        index_shift_y = abs(self.minY)
+        matrix_width = self.maxX - self.minX + 1
+        matrix_height = self.maxY - self.minY + 1
+        matrix = [[0 for x in range(matrix_width)] for y in range(matrix_height)]
+        for tile in self.tiles:
+            matrix_x = tile.x + index_shift_x
+            matrix_y = tile.y + index_shift_y
+            tile_filename = os.path.join(tile_directory, data_handler.get_location_tile_filename_from_tile(tile))
+            matrix[matrix_x][matrix_y] = (tile.x, tile.y, tile_filename)
+        generate_grid_image(filename, matrix)
 
 
 class Tile(object):

@@ -1,6 +1,9 @@
 import os
 import pprint
 import time
+import tempfile
+import sys
+import subprocess
 
 from PIL import Image
 
@@ -55,9 +58,13 @@ def get_parser():
     parser.add_argument('--show_unknown_colors',
                         help="shows the colors that can not be classified",
                         action='store_true')
+    parser.add_argument('--show_grid_image',
+                        help="generates and shows the grid image of the current tile map",
+                        action='store_true')
 
     parser.set_defaults(show_color_result=False)
     parser.set_defaults(show_unknown_colors=False)
+    parser.set_defaults(show_grid_image=False)
 
     return parser
 
@@ -114,7 +121,6 @@ if __name__ == "__main__":
     area_handler = GMapTileHandler()
     area_handler.setDebugMode(True)
     tile_list = area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
-
     print("all images loaded in target directory")
 
     color_definitions = [
@@ -192,3 +198,18 @@ if __name__ == "__main__":
 
     if (save_csv_result):
         print("area analysis results saved to {}".format(csv_file))
+
+    if args.show_grid_image:
+        print("*** generate tiles image ***")
+        tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+        tileMap = model.TileMap()
+        for tile_file in tile_list:
+            tile = get_location_tile(tile_file)
+            tileMap.appendTile(tile)
+        tileMap.saveTileMapImage(tf.name, target_dir)
+        print("temporay tile image generated ({})".format(tf.name))
+        print("try to open the grid image ...")
+        if sys.platform.startswith('linux'):
+            subprocess.call(["xdg-open", tf.name])
+        else:
+            os.startfile(tf.name)
