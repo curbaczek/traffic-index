@@ -1,5 +1,5 @@
 from __future__ import division
-from PIL import Image, ImageChops, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageMath
 from scipy.misc import imsave
 import numpy
 
@@ -22,42 +22,40 @@ def sum_color_count(color_count):
 
 
 def get_color_classes(image, color_classes=[], threshold=10):
-    """ takes a list of color classes tuples (name, color) and assign the image colors
+    """ takes a list of color classes tuples (name, color list) and assign the image colors
         with the given threshold to these classes """
     result = {}
     color_counts = get_color_count(image, True)
 
     if (len(color_classes) > 0):
         for color_class_definition in color_classes:
-
-            filtered_color_count = []
-            matched_colors = []
-
             class_name = color_class_definition[0]
-            class_color = color_class_definition[1]
+            assert isinstance(color_class_definition[1], list)
+            for class_color in color_class_definition[1]:
+                filtered_color_count = []
+                matched_colors = []
+                for color, count in color_counts:
+                    if (
+                        color[0] in range(class_color[0]-threshold, class_color[0]+threshold) and
+                        color[1] in range(class_color[1]-threshold, class_color[1]+threshold) and
+                        color[2] in range(class_color[2]-threshold, class_color[2]+threshold)
+                    ):
+                        matched_colors.append((color, count))
+                    else:
+                        filtered_color_count.append((color, count))
 
-            for color, count in color_counts:
-                if (
-                    color[0] in range(class_color[0]-threshold, class_color[0]+threshold) and
-                    color[1] in range(class_color[1]-threshold, class_color[1]+threshold) and
-                    color[2] in range(class_color[2]-threshold, class_color[2]+threshold)
-                ):
-                    matched_colors.append((color, count))
+                color_counts = filtered_color_count
+
+                if class_name in result:
+                    result[class_name]["colors"] += matched_colors
+                    result[class_name]["count"] += sum_color_count(matched_colors)
                 else:
-                    filtered_color_count.append((color, count))
-
-            color_counts = filtered_color_count
-
-            if class_name in result:
-                result[class_name]["colors"] += matched_colors
-                result[class_name]["count"] += sum_color_count(matched_colors)
-            else:
-                result.update({
-                    class_name: {
-                        "count": sum_color_count(matched_colors),
-                        "colors": matched_colors
-                    }
-                })
+                    result.update({
+                        class_name: {
+                            "count": sum_color_count(matched_colors),
+                            "colors": matched_colors
+                        }
+                    })
 
     result.update({
         "unknown": {
@@ -67,6 +65,36 @@ def get_color_classes(image, color_classes=[], threshold=10):
     })
 
     return result
+
+
+def get_filled_up_image(src, dest, color_classes=[], threshold=10, unassigned_color=(255, 255, 255)):
+    """ takes a list of color classes tuples (class_color, single_color) and colors the pixel colors
+        of the image with the given threshold """
+
+    img = Image.open(src).convert('RGB')
+    pxdata = numpy.array(img)
+    color_counts = get_color_count(src, True)
+
+    color_no = 0
+    for color, count in color_counts:
+        color_no += 1
+        color_class_found = False
+        for color_class_definition in color_classes:
+            class_color = color_class_definition[0]
+            seed_color = color_class_definition[1]
+            if (
+                color[0] in range(seed_color[0]-threshold, seed_color[0]+threshold) and
+                color[1] in range(seed_color[1]-threshold, seed_color[1]+threshold) and
+                color[2] in range(seed_color[2]-threshold, seed_color[2]+threshold)
+            ):
+                pxdata[(pxdata == color).all(axis=-1)] = class_color
+                color_class_found = True
+                break
+        if not(color_class_found):
+            pxdata[(pxdata == color).all(axis=-1)] = unassigned_color
+
+    imgdest = Image.fromarray(pxdata, mode='RGB')
+    imgdest.save(dest)
 
 
 def get_difference_image(src_1, src_2, dest, opacity=0.0):

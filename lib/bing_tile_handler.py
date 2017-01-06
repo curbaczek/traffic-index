@@ -4,7 +4,6 @@ from time import sleep
 
 from lib.tile_handler import TrafficTileHandler
 from lib.util.file import download_file
-from lib.util import image_analysis
 from os.path import join
 from lib.data_handler import get_location_tile_filename_from_tile
 
@@ -61,24 +60,10 @@ class BingTileHandler(TrafficTileHandler):
         download_file(map_link, local_filename)
         sleep(self.SLEEP_TIME)
 
-    def download_temporary_static_map(self, lat, lng, zoom):
-        tmp_file = tempfile.NamedTemporaryFile()
-        tmp_file.close()
-        self.download_static_map(lat, lng, zoom, "", tmp_file.name)
-        return tmp_file.name
-
-    def download_temporary_static_traffic_map(self, lat, lng, zoom):
-        tmp_file = tempfile.NamedTemporaryFile()
-        tmp_file.close()
-        self.download_static_map(lat, lng, zoom, "TrafficFlow", tmp_file.name)
-        return tmp_file.name
-
     def getTileImage(self, lat, lng, x, y, zoom, local_directory):
         tile = self.createTile(x, y, zoom)
         tile_filename = join(local_directory, get_location_tile_filename_from_tile(tile))
-        tmp_static_traffic_map = self.download_temporary_static_traffic_map(lat, lng, zoom)
-        tmp_static_map = self.download_temporary_static_map(lat, lng, zoom)
-        image_analysis.get_difference_image(tmp_static_traffic_map, tmp_static_map, tile_filename)
+        self.download_static_map(lat, lng, zoom, "TrafficFlow", tile_filename)
         return tile_filename
 
     def getTiles(self, lat, lng, zoom, tile_count, local_directory, printProgress=False):
