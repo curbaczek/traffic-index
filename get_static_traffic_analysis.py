@@ -135,8 +135,6 @@ if __name__ == "__main__":
         tile_list.append(args.input)
         print("loaded saved image: {}".format(args.input))
 
-    print(tile_list)
-
     color_classes_definition = get_color_class_definition()
     for tile in tile_list:
 
@@ -179,10 +177,10 @@ if __name__ == "__main__":
 
             tmp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
             get_filled_up_image(
-                tile_center, tmp_file.name, fill_color_definiton,
+                tile_filename, tmp_file.name, fill_color_definiton,
                 threshold=ANALYSE_THRESHOLD, unassigned_color=NOINFORMATION_COLOR)
             color_classes = get_color_classes(tmp_file.name, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-            Image.open(tile_center).show()
+            Image.open(tile_filename).show()
             Image.open(tmp_file.name).show()
 
             traffic_analysis_check = get_traffic_analysis(color_classes)

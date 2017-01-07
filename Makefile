@@ -28,4 +28,4 @@ traffic-karlsruhe:
 	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 20 --tiles 1
 
 traffic-paris:
-	$(run_get_traffic) --lat 48.8566140 --lng 2.3522220 --zoom 14 --tiles 1
+	$(run_get_traffic) --lat 48.8566140 --lng 2.3522220 --zoom 14 --tiles 1 --threshold=20 --show_color_classes_image
