@@ -57,7 +57,7 @@ class GMapTileHandler(AreaTileHandler):
     def getTileLink(self, centerLatLng, zoom):
         map_style = self.getMapStyle()
         return "{}?center={},{}&zoom={}&format={}&maptype=roadmap&style={}&size={}x{}&scale={}".format(
-            "https://maps.googleapis.com/maps/api/staticmap",
+            "http://maps.googleapis.com/maps/api/staticmap",
             centerLatLng.lat, centerLatLng.lng, zoom, self.FILE_FORMAT, map_style,
             self.IMAGE_WIDTH, self.IMAGE_HEIGHT, self.IMAGE_SCALE)
 

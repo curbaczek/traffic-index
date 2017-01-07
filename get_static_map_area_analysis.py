@@ -218,5 +218,7 @@ if __name__ == "__main__":
         print("try to open the grid image ...")
         if sys.platform.startswith('linux'):
             subprocess.call(["xdg-open", tf.name])
-        else:
+        elif sys.platform.startswith('win'):
             os.startfile(tf.name)
+        elif sys.platform.startswith('darwin'):
+            subprocess.call(["open", tf.name])
