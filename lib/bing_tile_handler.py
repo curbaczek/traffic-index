@@ -23,10 +23,10 @@ class BingTileHandler(TrafficTileHandler):
     BING_API_KEY = "Ai0rTccAvUMSnqQgoBn0_PQZDlqkri9n_N9DcG_x6bQ2e7n2b3orpTWl9T22NZQV"
 
     def __init__(self):
-        assert self.IMAGE_WIDTH in range(80, 2000),
-        "tile width must be between 80 and 2000, {:d} set".format(self.IMAGE_WIDTH)
-        assert self.IMAGE_HEIGHT in range(80, 1500),
-        "tile height must be between 80 and 1500, {:d} set".format(self.IMAGE_WIDTH)
+        assert self.IMAGE_WIDTH in range(80, 2000), "tile width must be between 80 and 2000, {:d} set".format(
+            self.IMAGE_WIDTH)
+        assert self.IMAGE_HEIGHT in range(80, 1500), "tile height must be between 80 and 1500, {:d} set".format(
+            self.IMAGE_HEIGHT)
         return
 
     def getFileFormat(self):
