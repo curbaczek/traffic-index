@@ -9,7 +9,7 @@ from PIL import Image
 
 from lib import data_handler
 from lib import model
-from lib.data_handler import get_location_tile
+from lib.data_handler import get_tile
 from lib.gmap_tile_handler import GMapTileHandler
 from lib.csv_handler import write_csv_data
 from lib.util.file import remove_file
@@ -128,11 +128,11 @@ if __name__ == "__main__":
     print("all images loaded in target directory")
 
     color_definitions = [
-        ("red", (255, 0, 0)),
-        ("green", (0, 255, 0)),
-        ("blue", (0, 0, 255)),
-        ("white", (255, 255, 255)),
-        ("black", (0, 0, 0))
+        ("red", [(255, 0, 0)]),
+        ("green", [(0, 255, 0)]),
+        ("blue", [(0, 0, 255)]),
+        ("white", [(255, 255, 255)]),
+        ("black", [(0, 0, 0)])
     ]
     color_threshold = 130
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     overall_start_time = time.time()
 
     for file_name in tile_list:
-        tile = get_location_tile(file_name)
+        tile = get_tile(file_name)
         file_path = os.path.join(target_dir, file_name)
 
         if args.show_detailed_analysis:
@@ -211,7 +211,7 @@ if __name__ == "__main__":
         tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         tileMap = model.TileMap()
         for tile_file in tile_list:
-            tile = get_location_tile(tile_file)
+            tile = get_tile(tile_file)
             tileMap.appendTile(tile)
         tileMap.saveTileMapImage(tf.name, target_dir)
         print("temporay tile image generated ({})".format(tf.name))

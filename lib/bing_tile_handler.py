@@ -1,41 +1,32 @@
-# import math
 import tempfile
-from time import sleep
 
-from lib.tile_handler import TrafficTileHandler
-from lib.util.file import download_file
-from os.path import join
-from lib.data_handler import get_location_tile_filename_from_tile
+from lib.tile_handler import TrafficTileHandler, MercatorProjection, G_LatLng, G_Point
 
 
 class BingTileHandler(TrafficTileHandler):
 
     """
     Handler to get tiles from the static bing map API
+    @see https://msdn.microsoft.com/en-us/library/ff701724.aspx
     """
 
     FILE_FORMAT = "PNG"
 
     DATA_SRC = "BING"
 
-    IMAGE_WIDTH = 640
-    IMAGE_HEIGHT = 640
+    IMAGE_WIDTH = 1400
+    IMAGE_HEIGHT = 1400
+    IMAGE_BOTTOM_MARGIN = 22
 
     SLEEP_TIME = 2
 
-    COLOR_WANTED_AREA = "FFFFFF"
-    COLOR_UNWANTED_AREA = "FDFDFD"
-
     BING_API_KEY = "Ai0rTccAvUMSnqQgoBn0_PQZDlqkri9n_N9DcG_x6bQ2e7n2b3orpTWl9T22NZQV"
 
-    DATA_SRC = "GMAP"
-
     def __init__(self):
-        # self.setHeavyTrafficColor(self.ROAD_AREA_COLOR)
-        # self.setModerateTrafficColor(self.HIGHWAY_AREA_COLOR)
-        # self.setLightTrafficColor(self.MANMADE_AREA_COLOR)
-        # self.setNoTrafficColor(self.NATURAL_AREA_COLOR)
-        # self.setNoInformationColor(self.TRANSIT_AREA_COLOR)
+        assert self.IMAGE_WIDTH in range(80, 2000),
+        "tile width must be between 80 and 2000, {:d} set".format(self.IMAGE_WIDTH)
+        assert self.IMAGE_HEIGHT in range(80, 1500),
+        "tile height must be between 80 and 1500, {:d} set".format(self.IMAGE_WIDTH)
         return
 
     def getFileFormat(self):
@@ -48,27 +39,16 @@ class BingTileHandler(TrafficTileHandler):
         return self.IMAGE_WIDTH
 
     def getTileHeight(self):
-        return self.IMAGE_HEIGHT
+        return self.IMAGE_HEIGHT - self.IMAGE_BOTTOM_MARGIN
 
-    def getMapLink(self, lat, lng, zoom, map_type):
+    def getTileBottomMargin(self):
+        return self.IMAGE_BOTTOM_MARGIN
+
+    def getSleepTime(self):
+        return self.SLEEP_TIME
+
+    def getTileLink(self, centerLatLng, zoom):
         return "{}/{},{}/{}?mapLayer={}&format={}&mapSize={},{}&labelOverlay=hidden&key={}".format(
             "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road",
-            lat, lng, zoom, map_type, self.FILE_FORMAT, self.IMAGE_WIDTH, self.IMAGE_HEIGHT, self.BING_API_KEY)
-
-    def download_static_map(self, lat, lng, zoom, map_layer, local_filename):
-        map_link = self.getMapLink(lat, lng, zoom, map_layer)
-        download_file(map_link, local_filename)
-        sleep(self.SLEEP_TIME)
-
-    def getTileImage(self, lat, lng, x, y, zoom, local_directory):
-        tile = self.createTile(x, y, zoom)
-        tile_filename = join(local_directory, get_location_tile_filename_from_tile(tile))
-        self.download_static_map(lat, lng, zoom, "TrafficFlow", tile_filename)
-        return tile_filename
-
-    def getTiles(self, lat, lng, zoom, tile_count, local_directory, printProgress=False):
-        """for x in range(1-tile_count, tile_count):
-            for y in range(1-tile_count, tile_count):
-                if (printProgress):
-                    print("load image {:+d}x{:+d}".format(x, y))
-                self.getTileImage(lat, lng, x, y, zoom, local_directory)"""
+            centerLatLng.lat, centerLatLng.lng, zoom, "TrafficFlow",
+            self.FILE_FORMAT, self.IMAGE_WIDTH, self.IMAGE_HEIGHT, self.BING_API_KEY)

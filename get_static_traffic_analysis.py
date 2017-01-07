@@ -1,10 +1,15 @@
 import os
 import pprint
 import tempfile
+
 from PIL import Image
+from lib import data_handler
+from lib import model
+
 from lib.bing_tile_handler import BingTileHandler
 from lib.util.image_analysis import get_color_count, get_color_classes, get_filled_up_image
-from lib import model
+
+LOCATION_DIR = "res/data/locations"
 
 
 def get_parser():
@@ -15,27 +20,37 @@ def get_parser():
                         dest="input",
                         help="read this file",
                         metavar="FILE",
-                        default="",
-                        required=False)
+                        default="")
     parser.add_argument('--lat',
                         type=str,
-                        help="latitude of the city")
+                        help="latitude of the city",
+                        required=False)
     parser.add_argument('--lng',
                         type=str,
-                        help="longitude of the city")
+                        help="longitude of the city",
+                        required=False)
     parser.add_argument('--zoom',
                         type=int,
-                        default=14,
-                        help="zoom level to analyse")
+                        help="zoom level to analyse",
+                        required=False,
+                        default=14)
+    parser.add_argument('--tiles',
+                        type=int,
+                        help="number of tiles taken around the center one, (2n-1)² images will be generated, " +
+                        "(8n-8) more than the previous tile level",
+                        dest='tile_count',
+                        required=False,
+                        default=1)
     parser.add_argument('--threshold',
                         type=int,
                         default=30,
                         help="threshold of the image analysis")
     parser.add_argument('--dest',
                         type=str,
-                        default="temp",
                         help="dir to save the images",
-                        dest='dest_dir')
+                        default="",
+                        dest='dest_dir',
+                        required=False)
     parser.add_argument('--show_color_classes_image',
                         help="shows the tile with the identified color classes",
                         action='store_true')
@@ -68,30 +83,35 @@ def get_traffic_analysis(color_analysis_result):
         no_information,
         unassigned=0)
 
+
+def get_target_directory(args):
+    latlng_dir = "{},{}".format(args.lat, args.lng)
+    location_dir = os.path.join(LOCATION_DIR, latlng_dir, data_handler.SUBDIR_TRAFFIC)
+    return location_dir if (args.dest_dir == "") else args.dest_dir
+
+
+def get_color_class_definition():
+    return [
+        ("green", [(122, 187, 68), (117, 183, 66), (97, 166, 69)]),
+        ("red", [(210, 57, 64), (205, 63, 68), (206, 75, 76), (208, 59, 65)]),
+        ("orange", [(251, 195, 75), (252, 186, 74), (240, 167, 61)]),
+        ("yellow", [(244, 236, 87), (242, 232, 84), (240, 232, 86), (218, 194, 61)])
+    ]
+
+
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
+
+    target_dir = get_target_directory(args)
+    print("set target directory '{}'".format(target_dir))
+    os.makedirs(target_dir, exist_ok=True)
+
     traffic_handler = BingTileHandler()
-
-    if (args.input == ""):
-
-        temp_dir = args.dest_dir
-        os.makedirs(temp_dir, exist_ok=True)
-
-        if (args.lat == ""):
-            print("[WARNING] latitude value should be set")
-        if (args.lng == ""):
-            print("[WARNING] longitude value should be set")
-
-        tile_center = traffic_handler.getTileImage(args.lat, args.lng, 0, 0, args.zoom, temp_dir)
-        print("loaded new image: {}".format(tile_center))
-
-    else:
-        tile_center = args.input
-        print("loaded saved image: {}".format(tile_center))
+    traffic_handler.setDebugMode(True)
 
     ANALYSE_THRESHOLD = args.threshold
-    assert ANALYSE_THRESHOLD > 0
+    assert ANALYSE_THRESHOLD > 0, "threshold must be positive"
     NOINFORMATION_COLOR = (255, 255, 255)
 
     color_green = (122, 187, 68)
@@ -99,55 +119,76 @@ if __name__ == "__main__":
     color_orange = (251, 195, 75)
     color_yellow = (244, 236, 87)
 
-    color_classes_definition = [
-        ("green", [color_green, (117, 183, 66), (97, 166, 69)]),
-        ("red", [color_red, (205, 63, 68), (206, 75, 76), (208, 59, 65)]),
-        ("orange", [color_orange, (252, 186, 74), (240, 167, 61)]),
-        ("yellow", [color_yellow, (242, 232, 84), (240, 232, 86), (218, 194, 61)])
-    ]
+    tile_list = []
+    if (args.input == ""):
 
-    color_classes = get_color_classes(tile_center, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-    traffic_analysis = get_traffic_analysis(color_classes)
+        if (args.lat == ""):
+            raise Exception("[ERROR] latitude value should be set")
+        if (args.lng == ""):
+            raise Exception("[ERROR] latitude value should be set")
 
-    print("*** full color analysis result ***")
-    pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(color_classes)
+        print("*** download traffic tiles ***")
+        tile_list = traffic_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
+        print("all images loaded in target directory")
 
-    print("*** unknown color analysis result ***")
-    pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(color_classes["unknown"])
+    else:
+        tile_list.append(args.input)
+        print("loaded saved image: {}".format(args.input))
 
-    print("*** area analysis result ***")
-    print(traffic_analysis)
-    (img_width, img_height) = Image.open(tile_center).size
-    assert traffic_analysis.get_overall_sum() == img_width * img_height
+    print(tile_list)
 
-    if args.show_color_classes_image:
+    color_classes_definition = get_color_class_definition()
+    for tile in tile_list:
 
-        print("*** generate fill-up image ***")
+        tile_filename = os.path.join(target_dir, tile)
+        color_classes = get_color_classes(tile_filename, color_classes_definition, threshold=ANALYSE_THRESHOLD)
+        traffic_analysis = get_traffic_analysis(color_classes)
 
-        color_translation = {
-            "green": color_green,
-            "red": color_red,
-            "orange": color_orange,
-            "yellow": color_yellow
-        }
+        # print("*** full color analysis result ***")
+        # pp = pprint.PrettyPrinter(indent=4)
+        # pp.pprint(color_classes)
 
-        fill_color_definiton = []
-        for color_definition in color_classes_definition:
-            for color in color_definition[1]:
-                fill_color_definiton.append(
-                    (color_translation[color_definition[0]], color)
-                )
+        # print("*** unknown color analysis result ***")
+        # pp = pprint.PrettyPrinter(indent=4)
+        # pp.pprint(color_classes["unknown"])
 
-        tmp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-        get_filled_up_image(
-            tile_center, tmp_file.name, fill_color_definiton,
-            threshold=ANALYSE_THRESHOLD, unassigned_color=NOINFORMATION_COLOR)
-        color_classes = get_color_classes(tmp_file.name, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-        Image.open(tile_center).show()
-        Image.open(tmp_file.name).show()
+        print("*** area analysis {} ***".format(tile))
+        print(traffic_analysis)
+        (img_width, img_height) = Image.open(tile_filename).size
+        assert traffic_analysis.get_overall_sum() == img_width * img_height, \
+            "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
+                img_width * img_height, traffic_analysis.get_overall_sum())
 
-        traffic_analysis_check = get_traffic_analysis(color_classes)
-        assert traffic_analysis.get_overall_sum() == img_width * img_height
-        assert traffic_analysis.get_traffic_sum() == traffic_analysis_check.get_traffic_sum()
+        if args.show_color_classes_image:
+
+            print("*** generate fill-up image {} ***".format(tile))
+
+            color_translation = {
+                "green": color_green,
+                "red": color_red,
+                "orange": color_orange,
+                "yellow": color_yellow
+            }
+
+            fill_color_definiton = []
+            for color_definition in color_classes_definition:
+                for color in color_definition[1]:
+                    fill_color_definiton.append(
+                        (color_translation[color_definition[0]], color)
+                    )
+
+            tmp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            get_filled_up_image(
+                tile_center, tmp_file.name, fill_color_definiton,
+                threshold=ANALYSE_THRESHOLD, unassigned_color=NOINFORMATION_COLOR)
+            color_classes = get_color_classes(tmp_file.name, color_classes_definition, threshold=ANALYSE_THRESHOLD)
+            Image.open(tile_center).show()
+            Image.open(tmp_file.name).show()
+
+            traffic_analysis_check = get_traffic_analysis(color_classes)
+            assert traffic_analysis_check.get_overall_sum() == img_width * img_height, \
+                "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
+                    img_width * img_height, traffic_analysis_check.get_overall_sum())
+            assert traffic_analysis.get_traffic_sum() == traffic_analysis_check.get_traffic_sum(), \
+                "fill-up image analysis pixel sum {:d} differs from original image analysis {:d}".format(
+                    traffic_analysis_check.get_traffic_sum(), traffic_analysis.get_traffic_sum())

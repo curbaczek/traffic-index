@@ -163,8 +163,7 @@ class TrafficAnalysis(object):
         return self.get_traffic_sum() + self.noinformation
 
     def get_traffic_sum(self):
-        traffic_sum = self.heavy + self.moderate + self.light + self.notraffic
-        return -1 if traffic_sum == 0 else traffic_sum
+        return self.heavy + self.moderate + self.light + self.notraffic
 
     def get_heavy_portion(self):
         return self.heavy/self.get_overall_sum()
@@ -181,6 +180,9 @@ class TrafficAnalysis(object):
     def get_noinformation_portion(self):
         return self.noinformation/self.get_overall_sum()
 
+    def get_unassigned_portion(self):
+        return self.unassigned/self.get_overall_sum()
+
     def __str__(self):
         traffic_sum = self.get_traffic_sum()
         return (
@@ -191,15 +193,15 @@ class TrafficAnalysis(object):
             "no-information: {}px, {:.4f}% of total").format(
             self.heavy,
             self.get_heavy_portion()*100,
-            "---" if traffic_sum == 0 else 100*self.heavy/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*self.heavy/traffic_sum,
             self.moderate,
             self.get_moderate_portion()*100,
-            "---" if traffic_sum == 0 else 100*self.moderate/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*self.moderate/traffic_sum,
             self.light,
             self.get_light_portion()*100,
-            "---" if traffic_sum == 0 else 100*self.light/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*self.light/traffic_sum,
             self.notraffic,
             self.get_notraffic_portion()*100,
-            "---" if traffic_sum == 0 else 100*self.notraffic/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*self.notraffic/traffic_sum,
             self.noinformation,
             self.get_noinformation_portion()*100)

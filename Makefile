@@ -24,8 +24,8 @@ clean:
 karlsruhe:
 	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 2 --csv "temp/ka_area_analysis.csv"
 
-traffic-analysis:
-	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 14 --dest "temp"
+traffic-karlsruhe:
+	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 20 --tiles 1
 
 traffic-paris:
-	$(run_get_traffic) --lat 48.8566140 --lng 2.3522220 --zoom 14 --dest "temp" --show_color_classes_image --threshold=30
+	$(run_get_traffic) --lat 48.8566140 --lng 2.3522220 --zoom 14 --tiles 1
