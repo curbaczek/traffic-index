@@ -2,7 +2,7 @@ from PIL import Image, ImageFont, ImageDraw
 
 DRAW_TEXT_FONT = "res/fonts/arial_bold.ttf"
 DRAW_TEXT_FONT_SIZE = 30
-DRAW_TEXT_FONT_COLOR = (255, 255, 255)
+DRAW_TEXT_FONT_COLOR = (0, 0, 0)
 DRAW_TEXT_MARGIN = 5
 
 MAX_GRID_SIZE = 5000
