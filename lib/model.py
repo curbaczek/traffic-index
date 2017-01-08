@@ -2,7 +2,7 @@ from __future__ import division
 
 import os
 
-from lib import data_handler
+from lib.data_handler import get_tile_filename
 from lib.util.image import generate_grid_image
 
 SOURCE_GMAP = 'GMAP'
@@ -63,7 +63,8 @@ class TileMap(object):
         for tile in self.tiles:
             matrix_x = tile.x + index_shift_x
             matrix_y = tile.y + index_shift_y
-            tile_filename = os.path.join(tile_directory, data_handler.get_location_tile_filename_from_tile(tile))
+            tile_filename = get_tile_filename(tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
+            tile_filename = os.path.join(tile_directory, tile_filename)
             matrix[matrix_x][matrix_y] = (tile.x, tile.y, tile_filename)
         generate_grid_image(filename, matrix)
 

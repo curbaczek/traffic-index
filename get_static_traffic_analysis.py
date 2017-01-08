@@ -3,9 +3,9 @@ import pprint
 import tempfile
 
 from PIL import Image
-from lib import data_handler
 from lib import model
 
+from lib.data_handler import SUBDIR_TRAFFIC
 from lib.bing_tile_handler import BingTileHandler
 from lib.util.image_analysis import get_color_count, get_color_classes, get_filled_up_image
 
@@ -86,7 +86,7 @@ def get_traffic_analysis(color_analysis_result):
 
 def get_target_directory(args):
     latlng_dir = "{},{}".format(args.lat, args.lng)
-    location_dir = os.path.join(LOCATION_DIR, latlng_dir, data_handler.SUBDIR_TRAFFIC)
+    location_dir = os.path.join(LOCATION_DIR, latlng_dir, SUBDIR_TRAFFIC)
     return location_dir if (args.dest_dir == "") else args.dest_dir
 
 

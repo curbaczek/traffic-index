@@ -7,9 +7,8 @@ import subprocess
 
 from PIL import Image
 
-from lib import data_handler
 from lib import model
-from lib.data_handler import get_tile
+from lib.data_handler import get_tile, SUBDIR_TILES
 from lib.gmap_tile_handler import GMapTileHandler
 from lib.csv_handler import write_csv_data
 from lib.util.file import remove_file
@@ -75,7 +74,7 @@ def get_parser():
 
 def get_target_directory(args):
     latlng_dir = "{},{}".format(args.lat, args.lng)
-    location_dir = os.path.join(LOCATION_DIR, latlng_dir, data_handler.SUBDIR_TILES)
+    location_dir = os.path.join(LOCATION_DIR, latlng_dir, SUBDIR_TILES)
     return location_dir if (args.dest_dir == "") else args.dest_dir
 
 
