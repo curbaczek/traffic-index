@@ -22,10 +22,13 @@ clean:
 	find . -name "__pycache__" -exec rmdir {} \;
 
 karlsruhe:
-	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 16 --csv "temp/ka_area_analysis.csv" --show_grid_image
+	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 1 --show_grid_image
 
 traffic-karlsruhe:
-	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 20 --tiles 1
+	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --tiles 2
+
+traffic-berlin:
+	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 3
 
 traffic-paris:
 	$(run_get_traffic) --lat 48.8566140 --lng 2.3522220 --zoom 14 --tiles 1 --threshold=20 --show_color_classes_image

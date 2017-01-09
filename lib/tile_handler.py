@@ -136,11 +136,11 @@ class TileHandler(ABC):
         return get_tile_filename(
             tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
 
-    def getTileImage(self, lat, lng, x, y, zoom, local_directory):
+    def getTileImage(self, lat, lng, x, y, zoom, local_directory, check_latest_tile=True):
         self.printDebugMsg("load image {:+d}x{:+d}".format(x, y))
         tile_center = self.getMapCenter(lat, lng, zoom, x, y)
         tile_url = self.getTileLink(tile_center, zoom)
-        tile_filename = self.getLatestTile(x, y, zoom, local_directory)
+        tile_filename = self.getLatestTile(x, y, zoom, local_directory) if check_latest_tile else None
         if (tile_filename is None):
             tile_filename = self.getTileFilename(x, y, zoom)
             tile_path = join(local_directory, tile_filename)
@@ -150,11 +150,11 @@ class TileHandler(ABC):
             sleep(self.getSleepTime())
         return tile_filename
 
-    def getTiles(self, lat, lng, zoom, tile_count, local_directory):
+    def getTiles(self, lat, lng, zoom, tile_count, local_directory, check_latest_tile=True):
         tile_list = []
         for x in range(1-tile_count, tile_count):
             for y in range(1-tile_count, tile_count):
-                new_tile = self.getTileImage(lat, lng, x, y, zoom, local_directory)
+                new_tile = self.getTileImage(lat, lng, x, y, zoom, local_directory, check_latest_tile)
                 tile_list.append(new_tile)
         return tile_list
 

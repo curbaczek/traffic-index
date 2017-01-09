@@ -128,7 +128,8 @@ if __name__ == "__main__":
             raise Exception("[ERROR] latitude value should be set")
 
         print("*** download traffic tiles ***")
-        tile_list = traffic_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
+        tile_list = traffic_handler.getTiles(
+            args.lat, args.lng, args.zoom, args.tile_count, target_dir, check_latest_tile=False)
         print("all images loaded in target directory")
 
     else:
