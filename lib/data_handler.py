@@ -33,6 +33,12 @@ def get_latest_tile(directory, x, y, data_src, zoom, file_format):
     return None if (latest_tile == "") else latest_tile
 
 
+def get_tile_list(directory, data_src, zoom, file_format):
+    search_pattern = get_tile_filename("*", "*", data_src, zoom, "*", file_format)
+    file_list = glob.glob(os.path.join(directory, search_pattern))
+    return list(map(os.path.basename, file_list))
+
+
 def get_tile(filename):
     pattern = re.compile("^(\-?\d+)_(\-?\d+)_([A-Z]+)_(\d+)_(\d+)\.([A-Z]+)")
     match = pattern.match(filename.upper())

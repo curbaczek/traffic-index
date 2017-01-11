@@ -6,6 +6,7 @@ python3 := python3
 run_main := $(python3) traffic_index.py
 run_get_area := $(python3) get_static_map_area_analysis.py
 run_get_traffic := $(python3) get_static_traffic_analysis.py
+run_get_all_traffic := $(python3) get_all_tiles_traffic_analysis.py
 run_quick_tests := ./.quality-checks/pep8.sh
 run_detailed_tests := ./.quality-checks/pep8-detailed.sh
 
@@ -30,6 +31,9 @@ traffic-karlsruhe:
 
 traffic-berlin:
 	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 3
+
+alltraffic-berlin:
+	$(run_get_all_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --csv "temp/analysis-result-berlin.csv"
 
 traffic-paris:
 	$(run_get_traffic) --lat 48.8566140 --lng 2.3522220 --zoom 14 --tiles 1 --threshold=20 --show_color_classes_image

@@ -70,14 +70,6 @@ def get_parser():
     return parser
 
 
-def get_color_class_sum(color_class_result, colors):
-    result = 0
-    for color in color_class_result:
-        if color in colors:
-            result += color_class_result[color]["count"]
-    return result
-
-
 def get_traffic_analysis(color_analysis_result):
     heavy_traffic = color_analysis_result["red"]["count"]
     moderate_traffic = color_analysis_result["orange"]["count"]
@@ -161,7 +153,7 @@ if __name__ == "__main__":
         # pp = pprint.PrettyPrinter(indent=4)
         # pp.pprint(color_classes["unknown"])
 
-        print("*** area analysis {} ***".format(tile))
+        print("*** traffic analysis {} ***".format(tile))
         print(traffic_analysis)
         (img_width, img_height) = Image.open(tile_filename).size
         assert traffic_analysis.get_overall_sum() == img_width * img_height, \
