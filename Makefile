@@ -2,9 +2,10 @@
 build_folder := build
 temp_folder := temp
 
-run_main := python3 traffic_index.py
-run_get_area := python3 get_static_map_area_analysis.py
-run_get_traffic := python3 get_static_traffic_analysis.py
+python3 := python3
+run_main := $(python3) traffic_index.py
+run_get_area := $(python3) get_static_map_area_analysis.py
+run_get_traffic := $(python3) get_static_traffic_analysis.py
 run_quick_tests := ./.quality-checks/pep8.sh
 run_detailed_tests := ./.quality-checks/pep8-detailed.sh
 
@@ -25,7 +26,7 @@ karlsruhe:
 	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 1 --show_grid_image
 
 traffic-karlsruhe:
-	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --tiles 2
+	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --tiles 2 --show_grid_image --check_latest_tile
 
 traffic-berlin:
 	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 3

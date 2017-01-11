@@ -1,11 +1,13 @@
 import os
 import pprint
 import tempfile
+import sys
+import subprocess
 
 from PIL import Image
 from lib import model
 
-from lib.data_handler import SUBDIR_TRAFFIC
+from lib.data_handler import get_tile, SUBDIR_TRAFFIC
 from lib.bing_tile_handler import BingTileHandler
 from lib.util.image_analysis import get_color_count, get_color_classes, get_filled_up_image
 
@@ -51,10 +53,18 @@ def get_parser():
                         default="",
                         dest='dest_dir',
                         required=False)
+    parser.add_argument('--check_latest_tile',
+                        help="skips the download of new tiles and takes the latest tiles from the image directory",
+                        action='store_true')
+    parser.add_argument('--show_grid_image',
+                        help="generates and shows the grid image of the current tile map",
+                        action='store_true')
     parser.add_argument('--show_color_classes_image',
                         help="shows the tile with the identified color classes",
                         action='store_true')
 
+    parser.set_defaults(check_latest_tile=False)
+    parser.set_defaults(show_grid_image=False)
     parser.set_defaults(show_color_classes_image=False)
 
     return parser
@@ -129,7 +139,7 @@ if __name__ == "__main__":
 
         print("*** download traffic tiles ***")
         tile_list = traffic_handler.getTiles(
-            args.lat, args.lng, args.zoom, args.tile_count, target_dir, check_latest_tile=False)
+            args.lat, args.lng, args.zoom, args.tile_count, target_dir, args.check_latest_tile)
         print("all images loaded in target directory")
 
     else:
@@ -191,3 +201,20 @@ if __name__ == "__main__":
             assert traffic_analysis.get_traffic_sum() == traffic_analysis_check.get_traffic_sum(), \
                 "fill-up image analysis pixel sum {:d} differs from original image analysis {:d}".format(
                     traffic_analysis_check.get_traffic_sum(), traffic_analysis.get_traffic_sum())
+
+    if args.show_grid_image:
+        print("*** generate tiles image ***")
+        tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+        tileMap = model.TileMap()
+        for tile_file in tile_list:
+            tile = get_tile(tile_file)
+            tileMap.appendTile(tile)
+        tileMap.saveTileMapImage(tf.name, target_dir)
+        print("temporay tile image generated ({})".format(tf.name))
+        print("try to open the grid image ...")
+        if sys.platform.startswith('linux'):
+            subprocess.call(["xdg-open", tf.name])
+        elif sys.platform.startswith('win'):
+            os.startfile(tf.name)
+        elif sys.platform.startswith('darwin'):
+            subprocess.call(["open", tf.name])
