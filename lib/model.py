@@ -28,6 +28,7 @@ class TileMap(object):
 
     def resetTiles(self):
         self.tiles = []
+        self.skippedTiles = []
         self.minX = 0
         self.maxX = 0
         self.minY = 0
@@ -49,6 +50,9 @@ class TileMap(object):
             self.maxY = tile.y
         self.tiles.append(tile)
 
+    def setSkippedTilesList(self, tiles):
+        self.skippedTiles = tiles
+
     # TODO
     # def getActiveTiles(self):
     # def getTraffic...
@@ -63,9 +67,12 @@ class TileMap(object):
         for tile in self.tiles:
             matrix_x = tile.x + index_shift_x
             matrix_y = tile.y + index_shift_y
-            tile_filename = get_tile_filename(
-                tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
-            tile_filename = os.path.join(tile_directory, tile_filename)
+            if (tile.x, tile.y) in self.skippedTiles:
+                tile_filename = None
+            else:
+                tile_filename = get_tile_filename(
+                    tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
+                tile_filename = os.path.join(tile_directory, tile_filename)
             matrix[matrix_x][matrix_y] = (tile.x, tile.y, tile_filename)
         generate_grid_image(filename, matrix)
 

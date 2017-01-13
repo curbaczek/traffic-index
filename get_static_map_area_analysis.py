@@ -6,6 +6,7 @@ import sys
 import subprocess
 
 from PIL import Image
+from ast import literal_eval
 
 from lib import model
 from lib.data_handler import get_tile, SUBDIR_TILES
@@ -39,6 +40,11 @@ def get_parser():
                         "(8n-8) more than the previous tile level",
                         dest='tile_count',
                         required=True)
+    parser.add_argument('--skip',
+                        type=str,
+                        help="comma-seperated list of tiles identified by their coordinates, e.g. '(0,0),(-1,-2)'",
+                        required=False,
+                        default="")
     parser.add_argument('--dest',
                         type=str,
                         help="dir to save the images",
@@ -104,6 +110,10 @@ def write_analysis_result(filename, tile, analysis_result, duration):
         duration])
 
 
+def get_skip_list(skip_str):
+    return [] if skip_str == "" else literal_eval(skip_str)
+
+
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
@@ -124,6 +134,7 @@ if __name__ == "__main__":
     area_handler = GMapTileHandler()
     area_handler.setDebugMode(True)
     tile_list = area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
+    skip_list = get_skip_list(args.skip)
     print("all images loaded in target directory")
 
     color_definitions = [
@@ -150,6 +161,11 @@ if __name__ == "__main__":
 
         if args.show_detailed_analysis:
             print("*** analyse area {:+d}x{:+d} ***".format(tile.x, tile.y))
+
+        if ((tile.x, tile.y) in skip_list):
+            if args.show_detailed_analysis:
+                print("tile skipped")
+            continue
 
         start_time = time.time()
         color_result = get_color_classes(file_path, color_definitions, threshold=color_threshold)
@@ -212,6 +228,7 @@ if __name__ == "__main__":
         for tile_file in tile_list:
             tile = get_tile(tile_file)
             tileMap.appendTile(tile)
+        tileMap.setSkippedTilesList(skip_list)
         tileMap.saveTileMapImage(tf.name, target_dir)
         print("temporay tile image generated ({})".format(tf.name))
         print("try to open the grid image ...")

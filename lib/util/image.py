@@ -22,8 +22,16 @@ def get_grid_size(tiles_matrix):
 
 def get_grid_tile_size(tiles_matrix):
     assert len(tiles_matrix) > 0 and len(tiles_matrix[0]) > 0
-    tile_information = tiles_matrix[0][0]
-    tile_image = Image.open(tile_information[2])
+    tile_image = None
+    for x in range(len(tiles_matrix)):
+        if tile_image is not None:
+            break
+        for y in range(len(tiles_matrix[x])):
+            tile_information = tiles_matrix[x][y]
+            tile_filename = tile_information[2]
+            if tile_filename is not None:
+                tile_image = Image.open(tile_filename)
+                break
     return tile_image.size
 
 
@@ -59,13 +67,22 @@ def get_scaled_tile(filename, scale):
     return im
 
 
+def get_skipped_tile(width, height):
+    return Image.new("RGB", (width, height), "#EFEFEF")
+
+
+
 def generate_grid_image(image_filename, tiles_matrix, tiles_margin=3, show_coords=True):
     (grid, tile_scale) = init_grid_image(tiles_matrix, tiles_margin)
+    (tile_width, tile_height) = get_grid_tile_size(tiles_matrix)
     for x in range(len(tiles_matrix)):
         for y in range(len(tiles_matrix[x])):
             tile_information = tiles_matrix[x][y]
-            tile_image = get_scaled_tile(tile_information[2], tile_scale)
-            (tile_width, tile_height) = tile_image.size
+            tile_filename = tile_information[2]
+            if (tile_filename is None):
+                tile_image = get_skipped_tile(tile_width, tile_height)
+            else:
+                tile_image = get_scaled_tile(tile_filename, tile_scale)
             tile_pos_x = round(x * (tile_width + tiles_margin))
             tile_pos_y = round(y * (tile_height + tiles_margin))
             grid.paste(tile_image, (tile_pos_x, tile_pos_y))
