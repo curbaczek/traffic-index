@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 import time
 import math
+
 from time import sleep
+from os.path import join
+
 from lib import model
+from lib.model import ConsolePrinter
 from lib.data_handler import get_latest_tile, get_tile_filename
 from lib.util.file import download_file
-from os.path import join
 from lib.util import image
 
 MERCATOR_RANGE = 256
@@ -65,7 +68,7 @@ class MercatorProjection:
 
 class TileHandler(ABC):
 
-    debug_mode = False
+    printer = ConsolePrinter()
 
     @abstractmethod
     def getFileFormat(self):
@@ -94,9 +97,9 @@ class TileHandler(ABC):
     def getLatestTile(self, x, y, zoom, directory):
         latest_tile = get_latest_tile(directory, x, y, self.getDataSource(), zoom, self.getFileFormat())
         if (latest_tile is None):
-            self.printIndentedDebugMsg("no local file found")
+            self.printer.printIndentedDebugMsg("no local file found")
         else:
-            self.printIndentedDebugMsg("tile '{}' found, download skipped".format(latest_tile))
+            self.printer.printIndentedDebugMsg("tile '{}' found, download skipped".format(latest_tile))
         return latest_tile
 
     def createTile(self, x, y, zoom):
@@ -118,26 +121,13 @@ class TileHandler(ABC):
             centerPoint.y + (tile_y * (self.IMAGE_HEIGHT - self.IMAGE_BOTTOM_MARGIN)) / scale)
         return proj.fromPointToLatLng(newCenterPoint)
 
-    def setDebugMode(self, value):
-        self.debug_mode = bool(value)
-
-    def isDebugMode(self):
-        return self.debug_mode
-
-    def printDebugMsg(self, msg):
-        if (self.isDebugMode()):
-            print("[Debug] {}".format(msg))
-
-    def printIndentedDebugMsg(self, msg):
-        self.printDebugMsg("--- {}".format(msg))
-
     def getTileFilename(self, x, y, zoom):
         tile = self.createTile(x, y, zoom)
         return get_tile_filename(
             tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
 
     def getTileImage(self, lat, lng, x, y, zoom, local_directory, check_latest_tile=True):
-        self.printDebugMsg("load image {:+d}x{:+d}".format(x, y))
+        self.printer.printDebugMsg("load image {:+d}x{:+d}".format(x, y))
         tile_center = self.getMapCenter(lat, lng, zoom, x, y)
         tile_url = self.getTileLink(tile_center, zoom)
         tile_filename = self.getLatestTile(x, y, zoom, local_directory) if check_latest_tile else None
@@ -146,7 +136,7 @@ class TileHandler(ABC):
             tile_path = join(local_directory, tile_filename)
             download_file(tile_url, tile_path)
             image.bottom_crop_image(tile_path, self.getTileBottomMargin())
-            self.printIndentedDebugMsg("new tile downloaded")
+            self.printer.printIndentedDebugMsg("new tile downloaded")
             sleep(self.getSleepTime())
         return tile_filename
 

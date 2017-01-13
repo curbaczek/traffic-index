@@ -143,7 +143,7 @@ if __name__ == "__main__":
     os.makedirs(target_dir, exist_ok=True)
 
     traffic_handler = BingTileHandler()
-    traffic_handler.setDebugMode(True)
+    traffic_handler.printer.setDebugMode(True)
 
     ANALYSE_THRESHOLD = args.threshold
     assert ANALYSE_THRESHOLD > 0, "threshold must be positive"

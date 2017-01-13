@@ -132,7 +132,7 @@ if __name__ == "__main__":
     os.makedirs(target_dir, exist_ok=True)
 
     area_handler = GMapTileHandler()
-    area_handler.setDebugMode(True)
+    area_handler.printer.setDebugMode(True)
     tile_list = area_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
     skip_list = get_skip_list(args.skip)
     print("all images loaded in target directory")

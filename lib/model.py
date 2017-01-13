@@ -214,3 +214,27 @@ class TrafficAnalysis(object):
             0.0 if traffic_sum == 0 else 100*self.notraffic/traffic_sum,
             self.noinformation,
             self.get_noinformation_portion()*100)
+
+
+class ConsolePrinter(object):
+
+    debug_mode = False
+
+    def setDebugMode(self, value):
+        self.debug_mode = bool(value)
+
+    def isDebugMode(self):
+        return self.debug_mode
+
+    def printMsg(self, msg):
+        print(msg)
+
+    def printIndentedMsg(self, msg):
+        self.printMsg(msg)
+
+    def printDebugMsg(self, msg):
+        if (self.isDebugMode()):
+            print("[Debug] {}".format(msg))
+
+    def printIndentedDebugMsg(self, msg):
+        self.printDebugMsg("--- {}".format(msg))
