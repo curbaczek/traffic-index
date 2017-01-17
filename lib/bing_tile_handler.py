@@ -14,8 +14,8 @@ class BingTileHandler(TrafficTileHandler):
 
     DATA_SRC = "BING"
 
-    IMAGE_WIDTH = 1400
-    IMAGE_HEIGHT = 1400
+    IMAGE_WIDTH = 640
+    IMAGE_HEIGHT = 640
     IMAGE_BOTTOM_MARGIN = 22
 
     SLEEP_TIME = 2
