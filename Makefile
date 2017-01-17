@@ -23,8 +23,8 @@ clean:
 	find . -name "*~" -exec rm {} \;
 	find . -name "__pycache__" -exec rmdir {} \;
 
-area-karlsruhe:
-	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 3 --csv "temp/ka_area_analysis.csv" --show_grid_image
+karlsruhe:
+	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 2
 
 area-berlin:
 	$(run_get_area) --lat 52.5171480 --lng 13.3936320 --zoom 14 --tiles 3 --csv "temp/berlin_area_analysis.csv" --show_grid_image

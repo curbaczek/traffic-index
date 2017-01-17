@@ -102,9 +102,9 @@ class TileHandler(ABC):
             self.printer.printIndentedDebugMsg("tile '{}' found, download skipped".format(latest_tile))
         return latest_tile
 
-    def createTile(self, x, y, zoom):
+    def createTile(self, x, y, zoom, filepath):
         current_time = int(time.time())
-        return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat())
+        return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat(), filepath)
 
     @abstractmethod
     def getTileLink(self, centerLatLng, zoom):
@@ -122,7 +122,7 @@ class TileHandler(ABC):
         return proj.fromPointToLatLng(newCenterPoint)
 
     def getTileFilename(self, x, y, zoom):
-        tile = self.createTile(x, y, zoom)
+        tile = self.createTile(x, y, zoom, "")
         return get_tile_filename(
             tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
 
@@ -138,7 +138,7 @@ class TileHandler(ABC):
             image.bottom_crop_image(tile_path, self.getTileBottomMargin())
             self.printer.printIndentedDebugMsg("new tile downloaded")
             sleep(self.getSleepTime())
-        return tile_filename
+        return join(local_directory, tile_filename)
 
     def getTiles(self, lat, lng, zoom, tile_count, local_directory, check_latest_tile=True):
         tile_list = []

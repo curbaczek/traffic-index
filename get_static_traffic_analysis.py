@@ -1,18 +1,19 @@
-import os
-import pprint
-import tempfile
-import sys
-import subprocess
+"""
+load current traffic situation or a given snapshot and analyse it
+"""
 
-from PIL import Image
+import os
+import tempfile
+
 from lib import model
-from ast import literal_eval
+from lib.tile_analysis import TrafficTileMapAnalysis, TrafficTileAnalysis, DEFAULT_TRAFFIC_TILE_COLOR_THRESHOLD
 
 from lib.data_handler import get_tile, SUBDIR_TRAFFIC
 from lib.bing_tile_handler import BingTileHandler
-from lib.util.image_analysis import get_color_count, get_color_classes, get_filled_up_image
+from lib.util.file import open_file_from_shell, get_target_directory
+from lib.util.image_analysis import get_filled_up_image
 
-LOCATION_DIR = "res/data/locations"
+DEBUG_MODE = False
 
 
 def get_parser():
@@ -76,38 +77,7 @@ def get_parser():
     return parser
 
 
-def get_traffic_analysis(color_analysis_result):
-    heavy_traffic = color_analysis_result["red"]["count"]
-    moderate_traffic = color_analysis_result["orange"]["count"]
-    light_traffic = color_analysis_result["yellow"]["count"]
-    no_traffic = color_analysis_result["green"]["count"]
-    no_information = color_analysis_result["unknown"]["count"]
-
-    return model.TrafficAnalysis(
-        heavy_traffic,
-        moderate_traffic,
-        light_traffic,
-        no_traffic,
-        no_information,
-        unassigned=0)
-
-
-def get_target_directory(args):
-    latlng_dir = "{},{}".format(args.lat, args.lng)
-    location_dir = os.path.join(LOCATION_DIR, latlng_dir, SUBDIR_TRAFFIC)
-    return location_dir if (args.dest_dir == "") else args.dest_dir
-
-
-def get_color_class_definition():
-    return [
-        ("green", [(122, 187, 68), (117, 183, 66), (97, 166, 69)]),
-        ("red", [(210, 57, 64), (205, 63, 68), (206, 75, 76), (208, 59, 65)]),
-        ("orange", [(251, 195, 75), (252, 186, 74), (240, 167, 61)]),
-        ("yellow", [(244, 236, 87), (242, 232, 84), (240, 232, 86), (218, 194, 61)])
-    ]
-
-
-def get_tile_list(args, target_dir):
+def get_tile_list(args, traffic_handler, target_dir):
 
     tile_list = []
 
@@ -118,10 +88,8 @@ def get_tile_list(args, target_dir):
         if (args.lng == ""):
             raise Exception("[ERROR] latitude value should be set")
 
-        print("*** download traffic tiles ***")
         tile_list = traffic_handler.getTiles(
             args.lat, args.lng, args.zoom, args.tile_count, target_dir, args.check_latest_tile)
-        print("all images loaded in target directory")
 
     else:
         tile_list.append(args.input)
@@ -129,110 +97,60 @@ def get_tile_list(args, target_dir):
 
     return tile_list
 
-
-def get_skip_list(skip_str):
-    return [] if skip_str == "" else literal_eval(skip_str)
-
-
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
 
-    target_dir = get_target_directory(args)
-    print("set target directory '{}'".format(target_dir))
+    target_dir = get_target_directory(args.lat, args.lng, SUBDIR_TRAFFIC) if (args.dest_dir == "") else args.dest_dir
     os.makedirs(target_dir, exist_ok=True)
+    print("target directory '{}'".format(target_dir))
 
-    traffic_handler = BingTileHandler()
-    traffic_handler.printer.setDebugMode(True)
+    tile_handler = BingTileHandler()
+    tile_handler.printer.setDebugMode(DEBUG_MODE)
+    tile_list = get_tile_list(args, tile_handler, target_dir)
+    tile_map = model.TileMap()
+    tile_map.importFilelist(tile_list)
+    tile_map.deactivateTiles(args.skip)
+    print("all images loaded in target directory")
 
-    ANALYSE_THRESHOLD = args.threshold
-    assert ANALYSE_THRESHOLD > 0, "threshold must be positive"
-    NOINFORMATION_COLOR = (255, 255, 255)
-
-    color_green = (122, 187, 68)
-    color_red = (210, 57, 64)
-    color_orange = (251, 195, 75)
-    color_yellow = (244, 236, 87)
-
-    tile_list = get_tile_list(args, target_dir)
-    skip_list = get_skip_list(args.skip)
-
-    color_classes_definition = get_color_class_definition()
-    for tile_file in tile_list:
-
-        print("*** traffic analysis {} ***".format(tile_file))
-
-        tile_element = get_tile(tile_file)
-        if ((tile_element.x, tile_element.y) in skip_list):
-            print("tile skipped")
-            continue
-
-        tile_filename = os.path.join(target_dir, tile_file)
-        color_classes = get_color_classes(tile_filename, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-        traffic_analysis = get_traffic_analysis(color_classes)
-
-        # print("*** full color analysis result ***")
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(color_classes)
-
-        # print("*** unknown color analysis result ***")
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(color_classes["unknown"])
-
-        print(traffic_analysis)
-        (img_width, img_height) = Image.open(tile_filename).size
-        assert traffic_analysis.get_overall_sum() == img_width * img_height, \
-            "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
-                img_width * img_height, traffic_analysis.get_overall_sum())
-
-        if args.show_color_classes_image:
-
-            print("*** generate fill-up image {} ***".format(tile_file))
-
-            color_translation = {
-                "green": color_green,
-                "red": color_red,
-                "orange": color_orange,
-                "yellow": color_yellow
-            }
-
-            fill_color_definiton = []
-            for color_definition in color_classes_definition:
-                for color in color_definition[1]:
-                    fill_color_definiton.append(
-                        (color_translation[color_definition[0]], color)
-                    )
-
-            tmp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-            get_filled_up_image(
-                tile_filename, tmp_file.name, fill_color_definiton,
-                threshold=ANALYSE_THRESHOLD, unassigned_color=NOINFORMATION_COLOR)
-            color_classes = get_color_classes(tmp_file.name, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-            Image.open(tile_filename).show()
-            Image.open(tmp_file.name).show()
-
-            traffic_analysis_check = get_traffic_analysis(color_classes)
-            assert traffic_analysis_check.get_overall_sum() == img_width * img_height, \
-                "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
-                    img_width * img_height, traffic_analysis_check.get_overall_sum())
-            assert traffic_analysis.get_traffic_sum() == traffic_analysis_check.get_traffic_sum(), \
-                "fill-up image analysis pixel sum {:d} differs from original image analysis {:d}".format(
-                    traffic_analysis_check.get_traffic_sum(), traffic_analysis.get_traffic_sum())
+    assert args.threshold > 0, "threshold must be positive"
+    analysis = TrafficTileMapAnalysis(tile_map, args.threshold, "", debug_mode=DEBUG_MODE)
 
     if args.show_grid_image:
-        print("*** generate tiles image ***")
         tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-        tileMap = model.TileMap()
-        for tile_file in tile_list:
-            tile = get_tile(tile_file)
-            tileMap.appendTile(tile)
-        tileMap.setSkippedTilesList(skip_list)
-        tileMap.saveTileMapImage(tf.name, target_dir)
-        print("temporay tile image generated ({})".format(tf.name))
-        print("try to open the grid image ...")
-        if sys.platform.startswith('linux'):
-            subprocess.call(["xdg-open", tf.name])
-        elif sys.platform.startswith('win'):
-            os.startfile(tf.name)
-        elif sys.platform.startswith('darwin'):
-            subprocess.call(["open", tf.name])
+        tile_map.saveTileMapImage(tf.name, target_dir)
+        print("grid image generated, try to open the image {}".format(tf.name))
+        open_file_from_shell(tf.name)
+
+    if args.show_color_classes_image:
+        tile_file = tile_list.pop(0)
+        tile = get_tile(tile_file)
+        print("*** generate fill-up image of {} ***".format(tile_file))
+
+        color_green = (122, 187, 68)
+        color_red = (210, 57, 64)
+        color_orange = (251, 195, 75)
+        color_yellow = (244, 236, 87)
+
+        NOINFORMATION_COLOR = (255, 255, 255)
+
+        color_translation = {
+            "green": color_green,
+            "red": color_red,
+            "orange": color_orange,
+            "yellow": color_yellow
+        }
+
+        fill_color_definiton = []
+        color_classes_definition = TrafficTileAnalysis(tile, args.threshold).color_definitions
+        for color_definition in color_classes_definition:
+            for color in color_definition[1]:
+                fill_color_definiton.append(
+                    (color_translation[color_definition[0]], color)
+                )
+
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+        get_filled_up_image(
+            tile_file, tmp_file.name, fill_color_definiton,
+            threshold=args.threshold, unassigned_color=NOINFORMATION_COLOR)
+        open_file_from_shell(tmp_file.name)

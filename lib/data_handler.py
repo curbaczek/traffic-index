@@ -41,11 +41,12 @@ def get_tile_list(directory, data_src, zoom, file_format):
 
 def get_tile(filename):
     pattern = re.compile("^(\-?\d+)_(\-?\d+)_([A-Z]+)_(\d+)_(\d+)\.([A-Z]+)")
-    match = pattern.match(filename.upper())
+    match = pattern.match(os.path.basename(filename).upper())
     if match is not None:
         result_tile = model.Tile(
             int(match.group(1)), int(match.group(2)), match.group(3),
-            int(match.group(4)), int(match.group(5)), match.group(6))
+            int(match.group(4)), int(match.group(5)), match.group(6),
+            filename)
     else:
         result_tile = None
     return result_tile

@@ -71,7 +71,6 @@ def get_skipped_tile(width, height):
     return Image.new("RGB", (width, height), "#EFEFEF")
 
 
-
 def generate_grid_image(image_filename, tiles_matrix, tiles_margin=3, show_coords=True):
     (grid, tile_scale) = init_grid_image(tiles_matrix, tiles_margin)
     (tile_width, tile_height) = get_grid_tile_size(tiles_matrix)
