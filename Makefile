@@ -24,7 +24,7 @@ clean:
 	find . -name "__pycache__" -exec rmdir {} \;
 
 karlsruhe:
-	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 20 --csv "temp/ka_area_analysis.csv" --show_grid_image
+	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 5 --skip "(-4,-4),(-3,-4),(-2,-4),(-1,-4),(4,4)" --show_grid_image
 
 berlin:
 	$(run_get_area) --lat 52.5171480 --lng 13.3936320 --zoom 14 --tiles 3 --csv "temp/berlin_area_analysis.csv" --show_grid_image
@@ -46,7 +46,7 @@ traffic-karlsruhe:
 	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --tiles 2 --show_grid_image --check_latest_tile
 
 traffic-berlin:
-	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 3
+	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 1 --show_color_classes_image
 
 alltraffic-berlin:
 	$(run_get_all_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --csv "temp/analysis-result-berlin.csv"

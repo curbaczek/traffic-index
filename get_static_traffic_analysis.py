@@ -209,7 +209,7 @@ if __name__ == "__main__":
                 threshold=ANALYSE_THRESHOLD, unassigned_color=NOINFORMATION_COLOR)
             color_classes = get_color_classes(tmp_file.name, color_classes_definition, threshold=ANALYSE_THRESHOLD)
             Image.open(tile_filename).show()
-            Image.open(tmp_file.name).show()
+            subprocess.call(["open", tmp_file.name])
 
             traffic_analysis_check = get_traffic_analysis(color_classes)
             assert traffic_analysis_check.get_overall_sum() == img_width * img_height, \

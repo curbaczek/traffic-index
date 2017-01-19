@@ -101,8 +101,12 @@
 \newpage
 \section{Datenauswertung}
 
-% a) Städtebauliche Analyse
-\subsection{Städtebauliche Analyse}
+Im folgenden Kapitel soll das entwickelte Verfahren Anwendung bei der Verkehrsanalyse verschiedener Städte finden. Zunächst wird eine Plausibilisierung der aus google maps extrahierten Daten durchgeführt, indem diese mit gesicherten amtlichen Daten verglichen werden. 
+Im Anschluss daran werden die aus bing maps gewonnenen Verkehrsdaten untersucht und mit Erfahrungswerten der Verkehrsplanung verglichen.
+Weiterhin wird aus den Erfahrungen bei der Anwendung des Verfahrens ein strukturiertes Konzept entwickelt, wie die Parameter für die Durchführung der Analyse zu wählen sind.
+
+% a) Flächenanalyse
+\subsection{Flächenanalyse}
 
 In einer ersten Annäherung an die aus den online-Kartendiensten gesammelten Informationen soll deren Aussagegehalt in Bezug auf städtebauliche Größen und Eigenheiten einer Stadt untersucht werden. Hierzu werden die aus den Google Static Maps gewonnenen Daten über die verschiedenen Flächenanteile 
 \begin{enumerate}
@@ -112,9 +116,9 @@ In einer ersten Annäherung an die aus den online-Kartendiensten gesammelten Inf
 \item nature
 \item transit
 \end{enumerate}
-herangezogen. Hierbei verfolgt google eine eigene Klassifizierung der Flächennutzungen, die sich nicht mit den sogenannten "\textit{tatsächlichen Nutzungsarten}" der  \textit{Arbeitsgemeinschaft der Vermessungsverwaltungen der Länder der Bundesrepublik Deutschland (AdV)}, welche die Grundlage aller deutschen Liegenschaftskataster bilden \cite{advnutz} . Daher muss im Folgenden bei jedem Vergleich von Daten aus der Analyse und solchen aus staatlichen Erhebungen auf die entsprechenden Flächendefinitionen gedachtet.\\
+herangezogen. Hierbei verfolgt google eine eigene Klassifizierung der Flächennutzungen, die sich nicht mit den sogenannten "\textit{tatsächlichen Nutzungsarten}" der  \textit{Arbeitsgemeinschaft der Vermessungsverwaltungen der Länder der Bundesrepublik Deutschland (AdV)}, welche die Grundlage aller deutschen Liegenschaftskataster bilden \cite{advnutz} , deckt. Daher muss im Folgenden bei jedem Vergleich von Daten aus der Analyse und solchen aus staatlichen Erhebungen auf die entsprechenden Flächendefinitionen geachtet werden.\\
 \newline
-Um die entwickelte Flächenanalyse zu kalibrieren, soll im Folgenden am Beispiel des Stadtkreises Karlsruhe untersucht werden, wie die erzeugten und untersuchten Kacheln angeordnet werden müssen, um eine möglichst gute Annäherung an die offiziellen statistischen Daten des statistischen Landesamtes  Baden-Württemberg \cite{StatBaWu_Flaeche} zu erzielen.\\
+Um die von der entwickelten Flächenanalyse ermittelten Daten zu plausibilisieren, soll im Folgenden am Beispiel des Stadtkreises Karlsruhe untersucht werden, wie die erzeugten und untersuchten Kacheln angeordnet werden müssen, um eine möglichst gute Annäherung an die offiziellen statistischen Daten des statistischen Landesamtes  Baden-Württemberg \cite{StatBaWu_Flaeche} zu erzielen.\\
 \newline
 Der Stadtkreis Karlsruhe umfasst laut Statistischem Landesamt (Stand 2015) eine Fläche von rund \num{17.346} \si{\hectare} \cite{StatBaWu_Flaeche}, die Einwohnerzahl beläuft sich auf \num{307755} \cite{StatBaWu_Einw}. 
 %
@@ -158,18 +162,31 @@ Im Weiteren wird die Flächenanalyse nun für verschiedene Anzahlen an Kacheln d
 Die Ergebnisse einer Analyse der verschiedenen Nutzungsarten für das Karlsruher Stadtgebiet mit verschiedenen Kachelanzahlen sind in Abbildung \ref{fig:Kachel_vgl} dargestellt.\\
 Die Auswahl weniger Kacheln ( \((n:=3)\) oder  \((n:=4)\)) führt auf kleine Analysequadrate mit Kantenlängen von \num{2.5} \si{\kilo\metre} bzw. \num{3.5} \si{\kilo\metre}, die nur das Zentrum der Stadt in die Analyse einbeziehen. Dementsprechend nimmt die man-made area mehr als \num{60} \% der Gesamtfläche ein, während die Naturfläche bei maximal \num{30} \% liegt.\\
 Mit steigender Kachelzahl wird immer mehr des Stadtrandes und des Umlandes in die Analyse einbezogen, die Anteile von Verkehrsflächen und man-made area an der Gesamtfläche sinken deutlich ab zu Gunsten der Naturflächen, welche bei  \((n:=15)\) (Kantenlänge des Analysequadrates ca. \num{14.5} \si{\kilo\metre}) und  \((n:=16)\) (Kantenlänge des Analysequadrates ca. \num{15.5} \si{\kilo\metre}) mehr als \num{60} \% einnehmen. Die zuletzt erwähnten Kachelanzahlen erzeugen ein Analysequadrat, welches in seinen Ausdehnungen in der Größenordnung des Stadtgebiets liegt. Für eine vollkommene Umschließung des Stadtgebiets (maximale Nord-Süd-Ausdehnung ca. \num{16.5} \si{\kilo\metre}), maximale Ost-West-Ausdehnung ca. \num{19.0} \si{\kilo\metre}) muss für die Anzahl an Kacheln \((n:=20)\) gewählt werden.\\
-Allerdings muss erwähnt werden, dass die in Abbildung \ref{fig:Stadtgebiet_KA} dargestellte Gemarkung durch eine solche quadratische Analysefläche nur unzureichend angenähert werden kann. In diesem Fall bedeutet es, dass bestimmte Bereiche wie beispielsweise große Teile des Ettlinger Stadtgebiets fälschlicherweise in der Analyse erscheinen. Eine bessere Approximation kann durch gezielte Auswahl bzw. gezieltes Ausschließen einzelner Kacheln erreicht werden.
+Allerdings muss erwähnt werden, dass die in Abbildung \ref{fig:Stadtgebiet_KA} dargestellte Gemarkung durch eine solche quadratische Analysefläche nur unzureichend angenähert werden kann. In diesem Fall bedeutet es, dass bestimmte Bereiche wie beispielsweise große Teile des Ettlinger Stadtgebiets fälschlicherweise in der Analyse erscheinen. Eine bessere Approximation kann durch gezielte Auswahl bzw. gezieltes Ausschließen einzelner Kacheln erreicht werden.\\
+Im Folgenden wird eine solche Auswahl vorgenommen, indem nur die entsprechenden Kacheln gewählt werden, die innerhalb des Karlsruher Stadtgebietes liegen.
 
-
-
-
-
-%Beispielhaft sollen an dieser Stelle mehrere baden-württembergische Städte zunächst mit Hilfe des entwickelten Programms analysiert und anschließend verglichen werden.
-
+Anhand des Beispiels Karlsruhe konnte damit gezeigt werden, dass das entwickelte Verfahren die reale Flächenverteilung gut annähern kann. 
 
 % b) Verkehrliche Analyse
 \newpage
-\subsection{Verkehrliche Analyse}
+\subsection{Verkehrsanalyse}
+
+% c) Ableitung eines allgemeinen Leitfadens
+\newpage
+\subsection{Ableitung eines allgemeinen Leitfadens}
+
+Um eine größere Menge verschiedener Städte möglichst schnell auf ihre verkehrliche Situation zu untersuchen, ist es sinnvoll, ein standardisiertes Vorgehen für die Erstellung einer Verkehrsuntersuchung festzulegen. Die Vorbereitung der Analyse läuft dabei wie folgt ab:
+
+\begin{enumerate}
+\item Die geographischen Koordinaten (lat, long) des Mittelpunktes der zentralen Kachel (0,0) wird festgelegt. Dies muss nicht zwingenderweise der in google oder bing maps hinterlegte zentrale Punkt einer Stadt sein. Vielmehr kann es durchaus sinnvoll sein, den Mittelpunkt möglichst mittig im später zu analysierenden Gebiet zu platzieren. Auf diese Weise kann die Anzahl benötigter Kacheln zur Abdeckung des Analysegebiets minimal gehalten werden.
+\newline
+\item Im Anschluss ist die Zoomstufe, in der die Kacheln geladen werden sollen, festzulegen. Hierbei treten zwei einschränkende Kriterien ein:\\
+Einerseits wird in einigen Städten eine minimale Zoomstufe durch die Auflösung der Gebäude- und Flächendaten vorgegeben. Bei Unterschreitung dieser wird das Ergebnis dahingehend verfälscht, dass sehr detailliert dargestellte Gebäudeumrisse in einer zu niedrigen Zoomstufe nicht als man-made area erkannt werden, sondern vielmehr den Naturflächen zugerechnet werden.\\
+Andererseits kann von Seiten der Verkehrsdaten eine minimale Zoomstufe notwendig sein, da kleinere Nebenstraßen z.T. erst in einer entsprechend hohen Zoomstufe angezeigt werden.\\
+In jedem Fall ist bei der Wahl der Zoomstufe zwischen Auflösung der Daten sowie Rechen- bzw. Speicheraufwand abzuwägen. Um den Aufwand gering zu halten, sollte die minimal mögliche Zoomstufe nicht deutlich überschritten werden.
+\newline
+\item Anhand der gewählten Zoomstufe wird nun die Anzahl an benötigten Kacheln evaluiert, die notwendig ist, um das gesamte Untersuchungsgebiet abzudecken. 
+\end{enumerate}
 
 
 %%%%%%%%%%%%%
@@ -177,6 +194,8 @@ Allerdings muss erwähnt werden, dass die in Abbildung \ref{fig:Stadtgebiet_KA} 
 %%%%%%%%%%%%%
 \newpage
 \section{Fazit und Ausblick}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Literaturverzeichnis (beginnt auf einer ungeraden Seite)   %
