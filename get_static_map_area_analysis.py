@@ -8,7 +8,7 @@ import tempfile
 from lib import model
 from lib.tile_analysis import AreaTileMapAnalysis, DEFAULT_AREA_TILE_COLOR_THRESHOLD
 
-from lib.data_handler import get_tile, SUBDIR_TILES
+from lib.data_handler import SUBDIR_TILES
 from lib.gmap_tile_handler import GMapTileHandler
 from lib.util.file import open_file_from_shell, get_target_directory
 
@@ -51,7 +51,7 @@ def get_parser():
     parser.add_argument('--csv',
                         type=str,
                         help="file to save the analysis results as csv",
-                        default="",
+                        default=None,
                         dest='csv_out',
                         required=False)
     parser.add_argument('--show_color_result',
@@ -93,8 +93,8 @@ if __name__ == "__main__":
 
     analysis = AreaTileMapAnalysis(tile_map, DEFAULT_AREA_TILE_COLOR_THRESHOLD, args.csv_out, debug_mode=DEBUG_MODE)
     print(analysis)
-    if args.csv_out != "":
-        print("single area analysis results saved to {}".format(args.csv_out))
+    if args.args.csv_out is not None:
+        print("single area analysis results saved to {}".format(csv_file))
 
     if args.show_grid_image:
         tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)

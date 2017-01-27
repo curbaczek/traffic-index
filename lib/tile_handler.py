@@ -102,7 +102,7 @@ class TileHandler(ABC):
             self.printer.printIndentedDebugMsg("tile '{}' found, download skipped".format(latest_tile))
         return latest_tile
 
-    def createTile(self, x, y, zoom, filepath):
+    def createTile(self, x, y, zoom, filepath=None):
         current_time = int(time.time())
         return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat(), filepath)
 
@@ -122,7 +122,7 @@ class TileHandler(ABC):
         return proj.fromPointToLatLng(newCenterPoint)
 
     def getTileFilename(self, x, y, zoom):
-        tile = self.createTile(x, y, zoom, "")
+        tile = self.createTile(x, y, zoom)
         return get_tile_filename(
             tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
 

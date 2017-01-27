@@ -8,7 +8,7 @@ import tempfile
 from lib import model
 from lib.tile_analysis import TrafficTileMapAnalysis, TrafficTileAnalysis, DEFAULT_TRAFFIC_TILE_COLOR_THRESHOLD
 
-from lib.data_handler import get_tile, SUBDIR_TRAFFIC
+from lib.data_handler import SUBDIR_TRAFFIC
 from lib.bing_tile_handler import BingTileHandler
 from lib.util.file import open_file_from_shell, get_target_directory
 from lib.util.image_analysis import get_filled_up_image
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     print("all images loaded in target directory")
 
     assert args.threshold > 0, "threshold must be positive"
-    analysis = TrafficTileMapAnalysis(tile_map, args.threshold, "", debug_mode=DEBUG_MODE)
+    analysis = TrafficTileMapAnalysis(tile_map, args.threshold, csv_file=None, debug_mode=DEBUG_MODE)
 
     if args.show_grid_image:
         tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
     if args.show_color_classes_image:
         tile_file = tile_list.pop(0)
-        tile = get_tile(tile_file)
+        tile = model.Tile.fromfile(tile_file)
         print("*** generate fill-up image of {} ***".format(tile_file))
 
         color_green = (122, 187, 68)

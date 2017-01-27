@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import time
+import os
 from datetime import datetime
 
 from lib.model import ConsolePrinter
@@ -50,18 +51,28 @@ class TrafficAnalysisResult(ABC):
 
 class TileMapAnalysis(ABC):
 
+    """
+    Abstract class to define the methods of the tile map analysis.
+    Debug mode will save all tile analysis to the csv file
+    """
+
     tile_map = None
     tile_analysis_list = []
     printer = ConsolePrinter()
-    csvfile = None
+    csv_file = None
     result = None
     color_threshold = 0
 
-    def __init__(self, tile_map, color_threshold, csv_file="", debug_mode=False):
+    def __init__(
+        self, tile_map, color_threshold, csv_file=None, debug_mode=False,
+            init_csv=False, save_tile_results=False):
         self.printer.setDebugMode(debug_mode)
         self.color_threshold = color_threshold
         self.tile_map = tile_map
-        self.init_csv_file(csv_file)
+        self.csv_file = csv_file
+        self.save_tile_results = save_tile_results
+        if init_csv:
+            self.init_csv_file()
         self.analyze()
 
     @abstractmethod
@@ -73,19 +84,22 @@ class TileMapAnalysis(ABC):
         for tile in self.tile_map.getActiveTiles():
             tile_analysis = self.get_tile_analysis(tile)
             self.printer.printDebugMsg(tile_analysis)
-            self.write_csv_analysis(tile, tile_analysis)
+            if self.save_tile_results:
+                self.write_csv_analysis(tile, tile_analysis)
             self.tile_analysis_list.append(tile_analysis)
+        self.write_csv_analysis_list()
 
-    def init_csv_file(self, filename):
-        if (filename != ""):
-            self.csvfile = filename
-            remove_file(self.csvfile)
-            self.write_csv_headline()
-        else:
-            self.csvfile = None
+    def init_csv_file(self):
+        if os.path.isfile(self.csv_file):
+            remove_file(self.csv_file)
+        self.write_csv_headline()
 
     @abstractmethod
     def write_csv_headline(self):
+        pass
+
+    @abstractmethod
+    def write_csv_analysis_list(self):
         pass
 
     @abstractmethod
@@ -108,15 +122,29 @@ class AreaTileMapAnalysis(TileMapAnalysis):
     def get_tile_analysis(self, tile):
         return AreaTileAnalysis(tile, self.color_threshold)
 
+    def write_csv_analysis_list(self):
+        overall_sum, sum_roadmap, sum_highway, sum_manmade, sum_nature, sum_transit,\
+            sum_unassigned, sum_duration, tilemap_time = 0, 0, 0, 0, 0, 0, 0, 0, 0
+        for tile_analysis in self.tile_analysis_list:
+            tilemap_time = tilemap_time if tilemap_time > 0 else tile_analysis.tile.timestamp
+            overall_sum += tile_analysis.result.get_overall_sum()
+            sum_roadmap += tile_analysis.result.roadmap
+            sum_highway += tile_analysis.result.highway
+            sum_manmade += tile_analysis.result.manmade
+            sum_nature += tile_analysis.result.nature
+            sum_transit += tile_analysis.result.transit
+            sum_unassigned += tile_analysis.result.unassigned
+            sum_duration += tile_analysis.duration
+
     def write_csv_headline(self):
-        write_csv_data(self.csvfile, [
+        write_csv_data(self.csv_file, [
             'x', 'y', 'roadmap_portion', 'highway_portion', 'manmade_portion',
             'nature_portion', 'transit_portion', 'unassigned_portion', 'roadmap_absolute',
             'highway_absolute', 'manmade_absolute', 'nature_absolute', 'transit_absolute',
             'unassigned_absolute', 'duration [ms]'])
 
     def write_csv_analysis(self, tile, tile_analysis):
-        write_csv_data(self.csvfile, [
+        write_csv_data(self.csv_file, [
             tile.x, tile.y,
             tile_analysis.result.roadmap/tile_analysis.result.get_overall_sum()*100,
             tile_analysis.result.highway/tile_analysis.result.get_overall_sum()*100,
@@ -170,14 +198,44 @@ class TrafficTileMapAnalysis(TileMapAnalysis):
         return TrafficTileAnalysis(tile, self.color_threshold)
 
     def write_csv_headline(self):
-        write_csv_data(self.csvfile, [
+        write_csv_data(self.csv_file, [
             'x', 'y', 'time', 'traffic_portion_heavy [%]', 'traffi_portion_moderate [%]', 'traffic_portion_light [%]',
             'traffic_portion_notraffic [%]', 'heavy [px]', 'moderate [px]', 'light [px]', 'notraffic [px]',
             'noinformation [px]', 'unassigned [px]', 'calculation time [ms]', 'tile filename'])
 
+    def write_csv_analysis_list(self):
+        traffic_sum, sum_heavy, sum_moderate, sum_light, sum_notraffic,\
+            sum_noinformation, sum_unassigned, sum_duration, tilemap_time = 0, 0, 0, 0, 0, 0, 0, 0, 0
+        for tile_analysis in self.tile_analysis_list:
+            tilemap_time = tilemap_time if tilemap_time > 0 else tile_analysis.tile.timestamp
+            traffic_sum += tile_analysis.result.get_traffic_sum()
+            sum_heavy += tile_analysis.result.heavy
+            sum_moderate += tile_analysis.result.moderate
+            sum_light += tile_analysis.result.light
+            sum_notraffic += tile_analysis.result.notraffic
+            sum_noinformation += tile_analysis.result.noinformation
+            sum_unassigned += tile_analysis.result.unassigned
+            sum_duration += tile_analysis.duration
+
+        write_csv_data(self.csv_file, [
+            "*", "*",
+            datetime.fromtimestamp(tilemap_time).strftime('%Y-%m-%d %H:%M:%S'),
+            0.0 if traffic_sum == 0 else 100*sum_heavy/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*sum_moderate/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*sum_light/traffic_sum,
+            0.0 if traffic_sum == 0 else 100*sum_notraffic/traffic_sum,
+            sum_heavy,
+            sum_moderate,
+            sum_light,
+            sum_notraffic,
+            sum_noinformation,
+            sum_unassigned,
+            sum_duration,
+            "-"])
+
     def write_csv_analysis(self, tile, tile_analysis):
         traffic_sum = tile_analysis.result.get_traffic_sum()
-        write_csv_data(self.csvfile, [
+        write_csv_data(self.csv_file, [
             tile.x, tile.y,
             datetime.fromtimestamp(tile.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
             0.0 if traffic_sum == 0 else 100*tile_analysis.result.heavy/traffic_sum,

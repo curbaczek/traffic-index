@@ -2,8 +2,8 @@ from __future__ import division
 
 import os
 from ast import literal_eval
+from lib import data_handler
 
-from lib.data_handler import get_tile, get_tile_filename
 from lib.util.image import generate_grid_image
 
 SOURCE_GMAP = 'GMAP'
@@ -39,7 +39,17 @@ class TileMap(object):
         for tile in tiles:
             self.appendTile(tile)
 
+    def getPositionTile(self, x, y):
+        result = None
+        for tile in self.tiles:
+            if (tile.x, tile.y) == (x, y):
+                result = tile
+                break
+        return result
+
     def appendTile(self, tile):
+        # TODO exception handling
+        assert self.getPositionTile(tile.x, tile.y) is None
         if (tile.x < self.minX):
             self.minX = tile.x
         if (tile.x > self.minX):
@@ -52,7 +62,7 @@ class TileMap(object):
 
     def importFilelist(self, tile_file_list):
         for tile_file in tile_file_list:
-            tile = get_tile(tile_file)
+            tile = Tile.fromfile(tile_file)
             self.appendTile(tile)
 
     def getTiles(self):
@@ -78,7 +88,7 @@ class TileMap(object):
             matrix_x = tile.x + index_shift_x
             matrix_y = tile.y + index_shift_y
             if tile.active:
-                tile_filename = get_tile_filename(
+                tile_filename = data_handler.get_tile_filename(
                     tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
                 tile_filename = os.path.join(tile_directory, tile_filename)
             else:
@@ -89,7 +99,7 @@ class TileMap(object):
 
 class Tile(object):
 
-    def __init__(self, x, y, data_src, zoom, timestamp, file_format, path):
+    def __init__(self, x, y, data_src, zoom, timestamp=0, file_format="png", path=None):
         self.x = x
         self.y = y
         self.data_src = data_src
@@ -97,7 +107,21 @@ class Tile(object):
         self.timestamp = timestamp
         self.file_format = file_format
         self.active = True
-        self.path = path
+        if path is None or os.path.isfile(path):
+            self.path = path
+        else:
+            raise Exception("can not generate tile, file \"{}\" was not found".format(path))
+
+    @classmethod
+    def fromfile(cls, filename):
+        return cls(
+            data_handler.get_tile_x(filename),
+            data_handler.get_tile_y(filename),
+            data_handler.get_tile_data_src(filename),
+            data_handler.get_tile_zoom(filename),
+            data_handler.get_tile_timestamp(filename),
+            data_handler.get_tile_fileformat(filename),
+            filename)
 
     def activate(self):
         self.active = True
@@ -106,7 +130,9 @@ class Tile(object):
         self.active = False
 
     def __str__(self):
-        return "{},{} @ zoom {} from {} at {}".format(self.x, self.y, self.zoom, self.data_src, self.timestamp)
+        return "{},{} @ zoom {} from {} at {} ({}), file located at {}".format(
+            self.x, self.y, self.zoom, self.data_src, self.timestamp,
+            "active" if self.active else "inactive", self.path)
 
 
 class TrafficSnapshot(object):
