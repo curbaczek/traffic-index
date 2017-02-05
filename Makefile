@@ -11,6 +11,8 @@ run_get_all_traffic := $(python3) get_all_tiles_traffic_analysis.py
 run_quick_tests := ./.quality-checks/pep8.sh
 run_detailed_tests := ./.quality-checks/pep8-detailed.sh
 
+skip_list_rheinbrucke := '(-2,-2),(-1,-2),(0,-2),(1,-2),(2,-2),(0,-1),(2,-1),(-2,2),(0,1),(1,1),(2,1),(-1,2),(0,2),(1,2),(2,2)'
+
 quick_check:
 	$(run_quick_tests)
 
@@ -42,6 +44,9 @@ area-stuttgart:
 area-freiburg:
 	$(run_get_area) --lat 47.9938040 --lng 7.8325110 --zoom 15 --tiles 3 --csv "temp/freiburg_area_analysis.csv" --show_grid_image
 
+area-rheinbrucke:
+	$(run_get_area) --lat 49.0369910 --lng 8.3030190 --zoom 17 --tiles 3 --skip $(skip_list_rheinbrucke) --show_grid_image
+
 traffic-karlsruhe:
 	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 3
 
@@ -60,6 +65,10 @@ traffic-stuttgart:
 
 traffic-freiburg:
 	$(run_get_traffic) --lat 47.9938040 --lng 7.8325110 --zoom 15 --tiles 3
+
+traffic-rheinbrucke:
+	#$(run_get_traffic) --lat 49.0369910 --lng 8.3030190 --zoom 17 --tiles 3 --skip $(skip_list_rheinbrucke) --show_grid_image
+	$(run_get_traffic) --lat 49.0369910 --lng 8.3030190 --zoom 17 --tiles 3 --skip $(skip_list_rheinbrucke)
 
 analyse-traffic-karlsruhe:
 	$(run_get_all_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --csv "temp/karlsruhe_zoom-15_traffic-analysis-result.csv"
