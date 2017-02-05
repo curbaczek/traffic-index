@@ -82,8 +82,8 @@ def generate_grid_image(image_filename, tiles_matrix, tiles_margin=3, show_coord
                 tile_image = get_skipped_tile(tile_width, tile_height)
             else:
                 tile_image = get_scaled_tile(tile_filename, tile_scale)
-            tile_pos_x = round(x * (tile_width + tiles_margin))
-            tile_pos_y = round(y * (tile_height + tiles_margin))
+            tile_pos_x = round(x * (tile_width*tile_scale + tiles_margin))
+            tile_pos_y = round(y * (tile_height*tile_scale + tiles_margin))
             grid.paste(tile_image, (tile_pos_x, tile_pos_y))
             draw_grid_tile_coordinates(grid, tile_pos_x, tile_pos_y, tile_information[0], tile_information[1])
     grid.save(image_filename)
