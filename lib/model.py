@@ -79,6 +79,7 @@ class TileMap(object):
                 tile.deactivate()
 
     def saveTileMapImage(self, filename, tile_directory):
+        assert len(self.tiles) > 0
         index_shift_x = abs(self.minX)
         index_shift_y = abs(self.minY)
         matrix_width = self.maxX - self.minX + 1
@@ -156,6 +157,9 @@ class ConsolePrinter(object):
 
     def printMsg(self, msg):
         print(msg)
+
+    def printErrorMsg(self, msg):
+        self.printMsg("[ERROR] {}".format(msg))
 
     def printHeadlineMsg(self, msg, return_str=False):
         msg = "*** {} ***".format(msg)

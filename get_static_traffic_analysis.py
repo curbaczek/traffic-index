@@ -108,6 +108,11 @@ if __name__ == "__main__":
     tile_handler = BingTileHandler()
     tile_handler.printer.setDebugMode(DEBUG_MODE)
     tile_list = get_tile_list(args, tile_handler, target_dir)
+    if len(tile_list) == 0:
+        print("[ERROR] no images found and download of new tiles was not successfull, " +
+              "please check your internet connection")
+        exit()
+
     tile_map = model.TileMap()
     tile_map.importFilelist(tile_list)
     tile_map.deactivateTiles(args.skip)

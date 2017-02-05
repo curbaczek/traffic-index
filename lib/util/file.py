@@ -29,7 +29,7 @@ def copy_file_makedirs(src, dst):
     shutil.copyfile(src, dst)
 
 
-def download_file(url, local_filename):
+def download_file(url, local_filename, retry=3):
     urllib.request.urlretrieve(url, local_filename)
 
 

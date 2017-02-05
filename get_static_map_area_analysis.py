@@ -86,15 +86,20 @@ if __name__ == "__main__":
     tile_handler = GMapTileHandler()
     tile_handler.printer.setDebugMode(DEBUG_MODE)
     tile_list = tile_handler.getTiles(args.lat, args.lng, args.zoom, args.tile_count, target_dir)
+    if len(tile_list) == 0:
+        print("[ERROR] no images found and download of new tiles was not successfull, " +
+              "please check your internet connection")
+        exit()
+
     tile_map = model.TileMap()
     tile_map.importFilelist(tile_list)
     tile_map.deactivateTiles(args.skip)
-    print("all images loaded in target directory")
+    print("all matching images ({}) loaded in target directory".format(len(tile_list)))
 
     analysis = AreaTileMapAnalysis(tile_map, DEFAULT_AREA_TILE_COLOR_THRESHOLD, args.csv_out, debug_mode=DEBUG_MODE)
     print(analysis)
-    if args.args.csv_out is not None:
-        print("single area analysis results saved to {}".format(csv_file))
+    if args.csv_out is not None:
+        print("single area analysis results saved to {}".format(args.csv_out))
 
     if args.show_grid_image:
         tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
