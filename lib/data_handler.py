@@ -81,18 +81,19 @@ def get_tilemap_list(directory, data_src, zoom, file_format):
     """ get the tilemaps from all single tiles in a directory """
     tile_list = get_tile_list(directory, data_src, zoom, file_format, REG_PART_TIMESTAMP)
     tile_map_list = []
-    from lib import model
-    import copy
-    current_tile_map = model.TileMap()
-    for tile_filename in tile_list:
-        tile_path = os.path.join(directory, tile_filename)
-        x = get_tile_x(tile_filename)
-        y = get_tile_y(tile_filename)
-        if current_tile_map.getPositionTile(x, y) is not None:
-            tile_map_list.append(copy.deepcopy(current_tile_map))
-            current_tile_map = model.TileMap()
-        current_tile_map.appendTile(model.Tile.fromfile(tile_path))
-    tile_map_list.append(copy.deepcopy(current_tile_map))
+    if len(tile_list) > 0:
+        from lib import model
+        import copy
+        current_tile_map = model.TileMap()
+        for tile_filename in tile_list:
+            tile_path = os.path.join(directory, tile_filename)
+            x = get_tile_x(tile_filename)
+            y = get_tile_y(tile_filename)
+            if current_tile_map.getPositionTile(x, y) is not None:
+                tile_map_list.append(copy.deepcopy(current_tile_map))
+                current_tile_map = model.TileMap()
+            current_tile_map.appendTile(model.Tile.fromfile(tile_path))
+        tile_map_list.append(copy.deepcopy(current_tile_map))
 
     return tile_map_list
 

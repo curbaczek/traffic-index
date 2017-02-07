@@ -11,7 +11,13 @@ run_get_all_traffic := $(python3) get_all_tiles_traffic_analysis.py
 run_quick_tests := ./.quality-checks/pep8.sh
 run_detailed_tests := ./.quality-checks/pep8-detailed.sh
 
+# --- skip lists ---------------------------------------------------------------
 skip_list_rheinbrucke := '(-2,-2),(-1,-2),(0,-2),(1,-2),(2,-2),(0,-1),(2,-1),(-2,2),(0,1),(1,1),(2,1),(-1,2),(0,2),(1,2),(2,2)'
+
+# --- zoom levels and tiles ----------------------------------------------------
+zoom_rheinbrucke = 17
+tiles_rheinbrucke = 3
+
 
 quick_check:
 	$(run_quick_tests)
@@ -45,7 +51,7 @@ area-freiburg:
 	$(run_get_area) --lat 47.9938040 --lng 7.8325110 --zoom 15 --tiles 3 --csv "temp/freiburg_area_analysis.csv" --show_grid_image
 
 area-rheinbrucke:
-	$(run_get_area) --lat 49.0369910 --lng 8.3030190 --zoom 17 --tiles 3 --skip $(skip_list_rheinbrucke) --show_grid_image
+	$(run_get_area) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --tiles $(tiles_rheinbrucke) --skip $(skip_list_rheinbrucke) --show_grid_image
 
 traffic-karlsruhe:
 	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 3
@@ -68,10 +74,18 @@ traffic-freiburg:
 
 traffic-rheinbrucke:
 	#$(run_get_traffic) --lat 49.0369910 --lng 8.3030190 --zoom 17 --tiles 3 --skip $(skip_list_rheinbrucke) --show_grid_image
-	$(run_get_traffic) --lat 49.0369910 --lng 8.3030190 --zoom 17 --tiles 3 --skip $(skip_list_rheinbrucke)
+	$(run_get_traffic) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --tiles $(tiles_rheinbrucke) --skip $(skip_list_rheinbrucke)
 
 analyse-traffic-karlsruhe:
 	$(run_get_all_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --csv "temp/karlsruhe_zoom-15_traffic-analysis-result.csv"
 
 analyse-traffic-berlin:
 	$(run_get_all_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --csv "temp/berlin_traffic-analysis-result.csv"
+
+# --- analysis Rheinbrucke -----------------------------------------------------
+analysis_csv := "temp/morning_traffic_rheinbrucke.csv"
+analysis_gif := "temp/morning_traffic_rheinbrucke.gif"
+analysis_gif_start := "2017-02-06 05:00:00"
+analysis_gif_end := "2017-02-06 10:00:00"
+analyse-traffic-rheinbrucke:
+	$(run_get_all_traffic) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --csv $(analysis_csv) --gif $(analysis_gif) --gif-size 800 --gif-duration 1.0 --gif-time-start $(analysis_gif_start) --gif-time-end $(analysis_gif_end)

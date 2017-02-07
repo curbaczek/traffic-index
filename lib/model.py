@@ -1,6 +1,7 @@
 from __future__ import division
 
 import os
+import datetime
 from ast import literal_eval
 from lib import data_handler
 
@@ -26,6 +27,7 @@ class TileMap(object):
 
     def __init__(self):
         self.resetTiles()
+        self.timestamp = None
 
     def resetTiles(self):
         self.tiles = []
@@ -58,6 +60,8 @@ class TileMap(object):
             self.minY = tile.y
         if (tile.y > self.maxY):
             self.maxY = tile.y
+        self.timestamp = tile.timestamp if self.timestamp is None\
+            else min(self.timestamp, tile.timestamp)
         self.tiles.append(tile)
 
     def importFilelist(self, tile_file_list):
@@ -78,7 +82,11 @@ class TileMap(object):
             if (tile.x, tile.y) in tile_list:
                 tile.deactivate()
 
-    def saveTileMapImage(self, filename, tile_directory):
+    def getDateTime(self):
+        return None if self.timestamp is None\
+            else datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+    def saveTileMapImage(self, filename, tile_directory, final_size=None, show_grid_date=False):
         assert len(self.tiles) > 0
         index_shift_x = abs(self.minX)
         index_shift_y = abs(self.minY)
@@ -95,7 +103,8 @@ class TileMap(object):
             else:
                 tile_filename = None
             matrix[matrix_x][matrix_y] = (tile.x, tile.y, tile_filename)
-        generate_grid_image(filename, matrix)
+        grid_date_str = None if show_grid_date is False else self.getDateTime()
+        generate_grid_image(filename, matrix, grid_date_str=grid_date_str, final_size=final_size)
 
 
 class Tile(object):

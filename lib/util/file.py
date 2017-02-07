@@ -19,6 +19,10 @@ def clear_dir(dir_path):
             print(e)
 
 
+def remove_dir(dir_path):
+    shutil.rmtree(dir_path, ignore_errors=True)
+
+
 def copy_dir(src, dest):
     shutil.copytree(src, dest)
 
