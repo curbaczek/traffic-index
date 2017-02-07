@@ -39,6 +39,11 @@ def get_parser():
                         type=int,
                         default=DEFAULT_TRAFFIC_TILE_COLOR_THRESHOLD,
                         help="threshold of the image analysis")
+    parser.add_argument('--skip',
+                        type=str,
+                        help="comma-seperated list of tiles identified by their coordinates, e.g. '(0,0),(-1,-2)'",
+                        required=False,
+                        default="")
     parser.add_argument('--csv',
                         type=str,
                         help="file to save the analysis results as csv",
@@ -141,6 +146,7 @@ if __name__ == "__main__":
     for tile_map in all_traffic_tilemaps:
         tile_map_id += 1
         print("analyse tilemap {:3d}/{:3d}".format(tile_map_id, len(all_traffic_tilemaps)))
+        tile_map.deactivateTiles(args.skip)
         analysis = TrafficTileMapAnalysis(
             tile_map, args.threshold, args.csv_out, DEBUG_MODE, init_csv=(tile_map_id == 1))
 

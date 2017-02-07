@@ -12,7 +12,7 @@ run_quick_tests := ./.quality-checks/pep8.sh
 run_detailed_tests := ./.quality-checks/pep8-detailed.sh
 
 # --- skip lists ---------------------------------------------------------------
-skip_list_rheinbrucke := '(-2,-2),(-1,-2),(0,-2),(1,-2),(2,-2),(0,-1),(2,-1),(-2,2),(0,1),(1,1),(2,1),(-1,2),(0,2),(1,2),(2,2)'
+skip_list_rheinbrucke := '(-2,-2),(-1,-2),(0,-2),(1,-1),(-1,1),(-2,1),(1,-2),(2,-2),(0,-1),(2,-1),(-2,2),(0,1),(1,1),(2,1),(-1,2),(0,2),(1,2),(2,2)'
 
 # --- zoom levels and tiles ----------------------------------------------------
 zoom_rheinbrucke = 17
@@ -88,4 +88,4 @@ analysis_gif := "temp/morning_traffic_rheinbrucke.gif"
 analysis_gif_start := "2017-02-06 05:00:00"
 analysis_gif_end := "2017-02-06 10:00:00"
 analyse-traffic-rheinbrucke:
-	$(run_get_all_traffic) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --csv $(analysis_csv) --gif $(analysis_gif) --gif-size 800 --gif-duration 1.0 --gif-time-start $(analysis_gif_start) --gif-time-end $(analysis_gif_end)
+	$(run_get_all_traffic) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --skip $(skip_list_rheinbrucke) --csv $(analysis_csv) --gif $(analysis_gif) --gif-size 800 --gif-duration 0.5 --gif-time-start $(analysis_gif_start) --gif-time-end $(analysis_gif_end)
