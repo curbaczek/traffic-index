@@ -44,6 +44,18 @@ def get_parser():
                         help="comma-seperated list of tiles identified by their coordinates, e.g. '(0,0),(-1,-2)'",
                         required=False,
                         default="")
+    parser.add_argument('--analysis-time-start',
+                        type=str,
+                        help="start time (YYYY-MM-DD HH:MM:SS) of the tilemap analysis",
+                        default=None,
+                        dest='analysis_time_start',
+                        required=False)
+    parser.add_argument('--analysis-time-end',
+                        type=str,
+                        help="end time (YYYY-MM-DD HH:MM:SS) of the tilemap analysis",
+                        default=None,
+                        dest='analysis_time_end',
+                        required=False)
     parser.add_argument('--csv',
                         type=str,
                         help="file to save the analysis results as csv",
@@ -109,7 +121,6 @@ def generate_gif(args, all_traffic_tilemaps):
         if (filter_from_timestamp is not None and tile_map.timestamp < filter_from_timestamp) or\
            (filter_to_timestamp is not None and tile_map.timestamp > filter_to_timestamp):
             continue
-        print("--- save tilemap {:3d}/{:3d}".format(tile_map_id, len(all_traffic_tilemaps)))
         tf_prefix = str(tile_map_id).zfill(prefix_length) + "_"
         tf = tempfile.NamedTemporaryFile(prefix=tf_prefix, suffix=".png", delete=False, dir=temp_gif_dir)
         tile_map.saveTileMapImage(tf.name, target_dir, show_grid_date=True, final_size=tile_map_size)
@@ -129,6 +140,7 @@ def generate_gif(args, all_traffic_tilemaps):
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
+    print("")
 
     target_dir = get_target_directory(args.lat, args.lng, SUBDIR_TRAFFIC)
     os.makedirs(target_dir, exist_ok=True)
@@ -142,15 +154,28 @@ if __name__ == "__main__":
     all_traffic_tilemaps = get_tilemap_list(target_dir, search_data_src, args.zoom, search_file_format)
     print("found {} traffic tile maps in target directory".format(len(all_traffic_tilemaps)))
 
+    analysis_from_timestamp = get_timestamp(args.analysis_time_start)
+    analysis_to_timestamp = get_timestamp(args.analysis_time_end)
+    print("analyse all tile maps that match time window ({}-{})".format(
+        "..." if args.analysis_time_start is None else args.analysis_time_start,
+        "..." if args.analysis_time_end is None else args.analysis_time_end))
+
     tile_map_id = 0
+    tile_map_analysed = 0
+    tile_map_skipped = 0
     for tile_map in all_traffic_tilemaps:
         tile_map_id += 1
-        print("analyse tilemap {:3d}/{:3d}".format(tile_map_id, len(all_traffic_tilemaps)))
+        if (analysis_from_timestamp is not None and tile_map.timestamp < analysis_from_timestamp) or\
+           (analysis_to_timestamp is not None and tile_map.timestamp > analysis_to_timestamp):
+            tile_map_skipped += 1
+            continue
         tile_map.deactivateTiles(args.skip)
         analysis = TrafficTileMapAnalysis(
             tile_map, args.threshold, args.csv_out, DEBUG_MODE, init_csv=(tile_map_id == 1))
+        tile_map_analysed += 1
 
-    print("tiles analyzed, result written to {}".format(args.csv_out))
+    print("{} tiles analyzed, {} tiles skipped".format(tile_map_analysed, tile_map_skipped))
+    print("result written to {}".format(args.csv_out))
 
     if args.gif_out is not None:
         print("generate gif image")

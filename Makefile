@@ -85,7 +85,9 @@ analyse-traffic-berlin:
 # --- analysis Rheinbrucke -----------------------------------------------------
 analysis_csv := "temp/morning_traffic_rheinbrucke.csv"
 analysis_gif := "temp/morning_traffic_rheinbrucke.gif"
+analysis_start := "2017-02-06 00:00:00"
+analysis_end := "2017-02-07 00:00:00"
 analysis_gif_start := "2017-02-06 05:00:00"
 analysis_gif_end := "2017-02-06 10:00:00"
 analyse-traffic-rheinbrucke:
-	$(run_get_all_traffic) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --skip $(skip_list_rheinbrucke) --csv $(analysis_csv) --gif $(analysis_gif) --gif-size 800 --gif-duration 0.5 --gif-time-start $(analysis_gif_start) --gif-time-end $(analysis_gif_end)
+	$(run_get_all_traffic) --lat 49.0369910 --lng 8.3030190 --zoom $(zoom_rheinbrucke) --skip $(skip_list_rheinbrucke) --analysis-time-start $(analysis_start) --analysis-time-end $(analysis_end) --csv $(analysis_csv) --gif $(analysis_gif) --gif-size 800 --gif-duration 0.5 --gif-time-start $(analysis_gif_start) --gif-time-end $(analysis_gif_end)
