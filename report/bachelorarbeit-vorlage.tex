@@ -10,7 +10,7 @@
 % zur Kontrolle des Umbruchs Klassenoption draft verwenden
 
 
-% die folgenden Packete erlauben den Gebrauch von Umlauten und Ã
+% die folgenden Pakete erlauben den Gebrauch von Umlauten und Ã
 % in der Latex Datei
 \usepackage[utf8]{inputenc}
 % \usepackage[latin1]{inputenc} %  Alternativ unter Windows
@@ -40,12 +40,15 @@
   % Titelblatt der Arbeit
   \begin{titlepage}
 
-    \includegraphics[scale=0.45]{kit-logo.jpg} 
+    \includegraphics[scale=0.45]{images/0_kit-logo.jpg} 
     \vspace*{2cm} 
 
  \begin{center} \large 
     
-    Seminararbeit
+    Seminararbeit \\
+    im \\
+    Seminar Verkehrswesen
+    
     \vspace*{2cm}
 
     {\huge Stauindex}
@@ -55,10 +58,10 @@
     Christof Urbaczek\\
     Nils Hennemann
     
-    \vspace*{1.5cm}
+    \vspace*{1.0cm}
 
-    Datum der Abgabe
-    \vspace*{3.5cm}
+    Datum der Abgabe % max 31.03.2017
+    \vspace*{2.5cm}
 
     Betreuung: Dr.-Ing. Bastian Chlond \\[1cm]
     Fakultät für Bauingenieurwesen \\[0.5cm]
@@ -80,13 +83,19 @@
   % Ab sofort Seitenzahlen in der Kopfzeile anzeigen
   \pagestyle{headings}
   
-%%%%%%%%%
-% 1) Einleitung %
-%%%%%%%%%
-\section{Einleitung}
+%%%%%%%%%%%%%%%%
+% 1) Motivation und Zielsetzung %
+%%%%%%%%%%%%%%%%
+\section{Motivation und Zielsetzung}
 
-
-
+Die Untersuchung der Verkehrssituation eines (Siedlungs-)Gebietes stellt eine zentrale Aufgabe der strategischen Verkehrsplanung dar. Mögliche Zielsetzungen können hierbei die reine Quantifizierung der aktuellen Verkehrsverteilung, die Entwicklung einer Verkehrsprognose oder die Bewertung einer verkehrlich bedeutsamen (Bau-)Maßnahme sein. Um eine verlässliche Aussage über die Belastungen auf den Verkehrsnetzen eines Siedlungsraumes zu ermitteln, ist die Entwicklung eines Verkehrsmodells heute gängige Praxis in der strategischen Verkehrsplanung.\\
+\newline
+Bevor eine entsprechend aufwendige und teils langwierige Entwicklung eines Verkehrsmodells in Angriff genommen werden kann, ist eine ausführliche Voruntersuchung notwendig und es bedarf einer umfangreichen Grundlage an Strukturdaten, Verhaltensdaten, Verkehrskennzahlen und vielem mehr. In diesem Stadium der Untersuchung fehlt dem Planer bisher ein wirkungsvolles Tool, welches es ihm ermöglicht, eine Verkehrssituation schnell und automatisiert erfassen zu können.\\
+\newline
+Die vorliegende Seminararbeit setzt sich als Ziel, ein solches Tool zu entwickeln und dessen Möglichkeiten und Grenzen zu untersuchen. Hierzu soll alleine auf Basis öffentlich zugänglicher online-Kartendienste eine Routine entwickelt werden, welche die Flächennutzung, die aktuelle Verkehrssituation sowie deren zeitliche Veränderung eines Untersuchungsgebietes automatisiert ermittelt.\\
+\newline
+Im folgenden Kapitel wird zunächst auf die technische Umsetzung und Implementierung des Tools eingegangen. Es werden die Vor- und Nachteile verschiedener Kartendienste genannt und deren Eignung als Grundlage für die vorliegende Untersuchung ausgelotet. Des Weiteren wird beschrieben, wie die gesammelten Daten aus den Kartenelementen gewonnen, analysiert und schließlich visualisiert werden können. Das entwickelte Verfahren wird im daran anschließenden Kapitel auf ein Beispiel angewendet, um die wählbaren Parameter und deren Einfluss auf das Ergebnis im Rahmen einer Sensitivitätsanalyse abzuschätzen. Darauf aufbauend wird ein standardisiertes Vorgehen zur Schaffung einer einheitlichen Datenbasis abgeleitet. Diese findet Anwendung im darauffolgenden Kapitel, in welchem das Tool genutzt wird, um die Verkehrs- und insbesondere die Stausituation verschiedener Siedlungsgebiete zu analysieren und daraus für diese einen vergleichbaren Stauindex zu generieren. 
+In einem abschließenden Kapitel werden die Ergebnisse der Seminararbeit in einem Fazit zusammengefasst und deren Nutzen und Anwendbarkeit für die Verkehrsplanung sowie für Mobilitätsunternehmen erläutert.
 
 %%%%%%%%%%%%%%%%
 % 2) Technische Umsetzung  %
@@ -95,102 +104,107 @@
 \section{Technische Umsetzung}
 
 
-%%%%%%%%%%%%%
-% 3) Datenauswertung  %
-%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%
+% 3) Verfahrensentwicklung  %
+%%%%%%%%%%%%%%%%
 \newpage
-\section{Datenauswertung}
+\section{Verfahrensentwicklung}
 
-Im folgenden Kapitel soll das entwickelte Verfahren Anwendung bei der Verkehrsanalyse verschiedener Städte finden. Zunächst wird eine Plausibilisierung der aus google maps extrahierten Daten durchgeführt, indem diese mit gesicherten amtlichen Daten verglichen werden. 
-Im Anschluss daran werden die aus bing maps gewonnenen Verkehrsdaten untersucht und mit Erfahrungswerten der Verkehrsplanung verglichen.
-Weiterhin wird aus den Erfahrungen bei der Anwendung des Verfahrens ein strukturiertes Konzept entwickelt, wie die Parameter für die Durchführung der Analyse zu wählen sind.
+% a) Kalibrierung und Sensitivitätsanalyse
+Das im vorhergehenden Kapitel entwickelte Tool soll im Folgenden zunächst am Beispiel einer Flächenanalyse der Stadt Karlsruhe getestet werden, da im Gegensatz zur Verkehrssituation für diesen Fall genaue Vergleichsdaten vorliegen. Es werden die für die Untersuchung entscheidenden Parameter ermittelt und deren Einfluss auf die untersuchten Größen untersucht. Im Anschluss daran wird in einem zweiten Abschnitt ein standardisiertes Vorgehen vorgestellt, welches zur systematischen Verkehrsanalyse verschiedener Städte und Gebiete verwendet werden soll.\\
 
-% a) Flächenanalyse
-\subsection{Flächenanalyse}
+\subsection{Kalibrierung und Sensitivitätsanalyse}
 
-In einer ersten Annäherung an die aus den online-Kartendiensten gesammelten Informationen soll deren Aussagegehalt in Bezug auf städtebauliche Größen und Eigenheiten einer Stadt untersucht werden. Hierzu werden die aus den Google Static Maps gewonnenen Daten über die verschiedenen Flächenanteile 
-\begin{enumerate}
-\item road
-\item highway
-\item man-made
-\item nature
-\item transit
-\end{enumerate}
-herangezogen. Hierbei verfolgt google eine eigene Klassifizierung der Flächennutzungen, die sich nicht mit den sogenannten "\textit{tatsächlichen Nutzungsarten}" der  \textit{Arbeitsgemeinschaft der Vermessungsverwaltungen der Länder der Bundesrepublik Deutschland (AdV)}, welche die Grundlage aller deutschen Liegenschaftskataster bilden \cite{advnutz} , deckt. Daher muss im Folgenden bei jedem Vergleich von Daten aus der Analyse und solchen aus staatlichen Erhebungen auf die entsprechenden Flächendefinitionen geachtet werden.\\
+Das entwickelte Tool wird nun zunächst auf das Gebiet des Stadtgebiets Karlsruhe angewendet. Der Stadtkreis Karlsruhe umfasst laut Statistischem Landesamt Baden-Württemberg (Stand 2015) eine Fläche von rund \num{17.346} \si{\hectare} \cite{StatBaWu_Flaeche}, die Einwohnerzahl beläuft sich auf \num{307755} \cite{StatBaWu_Einw}.\\
+Es gilt zu zeigen, dass das Verfahren die reale Flächenaufteilung im Stadtgebiet abbilden kann. Hierbei verfolgt google maps eine eigene Klassifizierung der Flächennutzungen, die sich nicht mit den sogenannten "\textit{tatsächlichen Nutzungsarten}" der  \textit{Arbeitsgemeinschaft der Vermessungsverwaltungen der Länder der Bundesrepublik Deutschland (AdV)}, welche die Grundlage aller deutschen Liegenschaftskataster bilden \cite{advnutz} . Als Vergleichsbasis wird der Anteil an Naturfläche gewählt, da dieser in den Klassifizierungen der AdV und in denen von google maps ähnlich definiert ist.\\ 
 \newline
-Um die von der entwickelten Flächenanalyse ermittelten Daten zu plausibilisieren, soll im Folgenden am Beispiel des Stadtkreises Karlsruhe untersucht werden, wie die erzeugten und untersuchten Kacheln angeordnet werden müssen, um eine möglichst gute Annäherung an die offiziellen statistischen Daten des statistischen Landesamtes  Baden-Württemberg \cite{StatBaWu_Flaeche} zu erzielen.\\
+Zunächst wird untersucht, welche Zoomstufe in google maps sinnvollerweise ausgewählt werden muss, um das Stadtgebiet darstellen und analysieren zu können. Bei der Entscheidung, mit welcher Zoomstufe gearbeitet werden soll, gilt es, zwischen den Genauigkeitsanforderungen  der Daten und einer akzeptablen, zu verarbeitenden Datenmenge abzuwägen. Hierbei gelten die folgenden beiden Einschränkungen:\\
+\begin{itemize}
+\item Einerseits sollten das erzeugte Analysegebiet möglichst wenig über die Grenze des Stadtgebiets hinausragen, da die Analyse der Flächennutzung sonst verfälscht wird. Im vorliegenden Fall kann die minimale Zoomstufe damit zu 12 festgelegt werden, wie Abbildung \ref{fig:Stadtgebiet_KA} zeigt, da in diesem Fall das gesamte Stadtgebiet auf nur einer Kachel dargestellt werden kann.
+\item Auf der anderen Seite wird die maximale Zoomstufe von google je nach Datengrundlage vorgegeben, in Karlsruhe ist die maximale Zoomstufe mit 21 gegeben. Wie Abbildung \ref{fig:Schloss_KA} am Beispiel des Karlsruher Schlosses darstellt, führt dies auf eine Darstellung auf Gebäudeebene. Eine solch hohe Diskretisierung liefert zwar eine äußert präzise Darstellung der städtischen Flächen, ist aus der Gründen der Speicher- und Rechenaufwandes nicht sinnvoll, da zur Darstellung des Stadtgebietes in diesem Fall mehrere 10.000 Einzelkacheln analysiert werden müssten.
+\end{itemize}
+Um das gesamte Stadtgebiet mit hoher Präzision abbilden zu können und gleichzeitig eine adaptive Anpassung der Kachelauswahl an die Stadtgrenze zu ermöglichen, wird in der vorliegenden Kalibrierung wird mit einer (vergleichweise hohen) Zoomstufe von 17 gearbeitet. Auch hier wird für das Stadtgebiet Karlsruhe bereits die Analyse von knapp 1500 Einzelkacheln notwendig, weswegen für die spätere Anwendung eine geringere Zoomstufe empfohlen wird.\\
 \newline
-Der Stadtkreis Karlsruhe umfasst laut Statistischem Landesamt (Stand 2015) eine Fläche von rund \num{17.346} \si{\hectare} \cite{StatBaWu_Flaeche}, die Einwohnerzahl beläuft sich auf \num{307755} \cite{StatBaWu_Einw}. 
 %
 \begin{figure}
   \centering
-    \includegraphics[width=0.55\textwidth]{Stadtgebiet_KA_zoom12.PNG}
+    \includegraphics[width=0.55\textwidth]{images/3_Stadtgebiet_KA_zoom12.png}
     \caption{Darstellung der Gemarkungsgrenze des Stadtkreises Karlsruhe [Quelle: google maps, Zoomstufe 12]}
     \label{fig:Stadtgebiet_KA}
 \end{figure}
 %
-Die Gemarkungsgrenze des Stadtkreises, wie sie in google maps bei einer Zoomstufe von \num{12} dargestellt wird, zeigt Abbildung \ref{fig:Stadtgebiet_KA}. Mit Hilfe des im vorliegenden Projekt entwickelten Verfahrens wird nun versucht, das Stadtgebiet durch die erzeugten Kacheln zu approximieren. Bei der Entscheidung, mit welcher Zoomstufe gearbeitet werden soll, gilt es, zwischen den Genauigkeitsanforderungen  der Daten und einer akzeptablen, zu verarbeitenden Datenmenge abzuwägen. 
-%
 \begin{figure}
   \centering
-    \includegraphics[width=0.4\textwidth]{KA_Schloss_zoom21.PNG}
+    \includegraphics[width=0.6\textwidth]{images/3_KA_Schloss_zoom21.png}
     \caption{Darstellung des Karlsruher Schlosses bei höchster verfügbarer Zoomstufe [Quelle: google maps, Zoomstufe 21]}
     \label{fig:Schloss_KA}
 \end{figure}
 %
-Stellt man das Karlsruher Stadtgebiet in google maps mit der maximale Zoomstufe von 21 wählbar, führt dies auf eine Darstellung auf Gebäudeebene, wie Abbildung \ref{fig:Schloss_KA} am Beispiel des Karlsruher Schlosses darstellt. Damit ist eine solche nicht geeignet, um das gesamte Stadtgebiet darzustellen, da entsprechend mehrere tausend Einzelkacheln erzeugt werden müssten. In der vorliegenden Kalibrierung wird mit einer (vergleichweise hohen) Zoomstufe von 17 gearbeitet. Diese liefert eine sehr hohe Auflösung des Gebietes und enthält alle zu untersuchenden Flächen in ausreichender Genauigkeit, gleichzeitig kann die Analyse mit noch akzeptablem Rechenaufwand durchgeführt werden. Allerdings ist hier bereits für das Stadtgebiet Karlsruhe eine sehr große Zahl an Einzelkacheln notwendig, weswegen für die spätere Anwendung eine geringere Zoomstufe empfohlen wird.\\
-\newline
-Da google maps die wählbaren Zoomstufen nicht mit einem festen kartographischen Maßstab verknüpft, muss dieser durch eigene Abstandsmessungen ermittelt werden. Bei Zoomstufe 17 besitzt eine der erzeugten quadratischen Einzelkacheln beispielsweise eine Kantenlänge von ca. \num{500} \si{\metre}.\\
+Da google maps die wählbaren Zoomstufen nicht mit einem festen kartographischen Maßstab verknüpft, muss dieser durch eigene Abstandsmessungen ermittelt werden. Bei Zoomstufe 17 besitzt eine der erzeugten quadratischen Einzelkacheln beispielsweise eine Kantenlänge von ca. \num{500} \si{\metre}, wie in Abbildung \ref{fig:Zoomvgl} zu sehen ist.\\
 %
 \begin{figure}
   \centering
-    \includegraphics[width=0.4\textwidth]{Auswahl_tiles.png}
-    \caption{Anordnung und Auswahl der Kacheln zur Städtebaulichen Analyse}
-    \label{fig:Auswahl_tiles}
+    \includegraphics[width=0.6\textwidth]{images/3_Zoomvergleich_KA.png}
+    \caption{Vergleich der Kachelabmessungen bei verschiedenen Zoomstufen}
+    \label{fig:Zoomvgl}
 \end{figure}
 %
-Im Weiteren wird die Flächenanalyse nun für verschiedene Anzahlen an Kacheln durchgeführt. Das Prinzip der Kachelauswahl ist in Abbildung \ref{fig:Auswahl_tiles} dargestellt: eine Auswahl von \textit{n} tiles im Code erzeugt eine quadratische Analysefläche von \((2*n+1)^2\) Kacheln.\\
+Im Weiteren wird die Flächenanalyse nun für verschiedene Anzahlen an Kacheln durchgeführt, um zu untersuchen, wie sich die Flächenanteile mit zunehmendem Einzugsgebiet der Analyse verändern. Die Ergebnisse der Flächenanalyse für die Eingabe an Tiles je Richtung zwischen 12 und 20 ist in Abbildung \ref{fig:Zoomvgl} dargestellt.\\
 %
 \newline
 \begin{figure}
   \centering
-    \includegraphics[width=0.85\textwidth]{Kachelvergleich_KA.png}
+    \includegraphics[width=0.92\textwidth]{images/3_Kachelvergleich_KA.png}
     \caption{Ergebnisse der Flächenanalyse für den Stadtkreis Karlsruhe für verschiedene Kachelanzahlen}
     \label{fig:Kachel_vgl}
 \end{figure}
 %
-Die Ergebnisse einer Analyse der verschiedenen Nutzungsarten für das Karlsruher Stadtgebiet mit verschiedenen Kachelanzahlen sind in Abbildung \ref{fig:Kachel_vgl} dargestellt.\\
-Die Auswahl weniger Kacheln ( \((n:=3)\) oder  \((n:=4)\)) führt auf kleine Analysequadrate mit Kantenlängen von \num{2.5} \si{\kilo\metre} bzw. \num{3.5} \si{\kilo\metre}, die nur das Zentrum der Stadt in die Analyse einbeziehen. Dementsprechend nimmt die man-made area mehr als \num{60} \% der Gesamtfläche ein, während die Naturfläche bei maximal \num{30} \% liegt.\\
-Mit steigender Kachelzahl wird immer mehr des Stadtrandes und des Umlandes in die Analyse einbezogen, die Anteile von Verkehrsflächen und man-made area an der Gesamtfläche sinken deutlich ab zu Gunsten der Naturflächen, welche bei  \((n:=15)\) (Kantenlänge des Analysequadrates ca. \num{14.5} \si{\kilo\metre}) und  \((n:=16)\) (Kantenlänge des Analysequadrates ca. \num{15.5} \si{\kilo\metre}) mehr als \num{60} \% einnehmen. Die zuletzt erwähnten Kachelanzahlen erzeugen ein Analysequadrat, welches in seinen Ausdehnungen in der Größenordnung des Stadtgebiets liegt. Für eine vollkommene Umschließung des Stadtgebiets (maximale Nord-Süd-Ausdehnung ca. \num{16.5} \si{\kilo\metre}), maximale Ost-West-Ausdehnung ca. \num{19.0} \si{\kilo\metre}) muss für die Anzahl an Kacheln \((n:=20)\) gewählt werden.\\
-Allerdings muss erwähnt werden, dass die in Abbildung \ref{fig:Stadtgebiet_KA} dargestellte Gemarkung durch eine solche quadratische Analysefläche nur unzureichend angenähert werden kann. In diesem Fall bedeutet es, dass bestimmte Bereiche wie beispielsweise große Teile des Ettlinger Stadtgebiets fälschlicherweise in der Analyse erscheinen. Eine bessere Approximation kann durch gezielte Auswahl bzw. gezieltes Ausschließen einzelner Kacheln erreicht werden.\\
-Im Folgenden wird eine solche Auswahl vorgenommen, indem nur die entsprechenden Kacheln gewählt werden, die innerhalb des Karlsruher Stadtgebietes liegen.
+Mit steigender Kachelzahl wird immer mehr des Stadtrandes und des Umlandes in die Analyse einbezogen, die Anteile von Verkehrsflächen und \textit{man-made area} an der Gesamtfläche sinken ab zu Gunsten der Naturflächen, welche bei  \((n:=15)\) (Kantenlänge des Analysequadrates ca. \num{14.5} \si{\kilo\metre}) und  \((n:=16)\) (Kantenlänge des Analysequadrates ca. \num{15.5} \si{\kilo\metre}) mehr als \num{60} \% einnehmen. Die zuletzt erwähnten Kachelanzahlen erzeugen ein Analysequadrat, welches in seinen Ausdehnungen in der Größenordnung des Stadtgebiets liegt. Für eine vollkommene Umschließung des Stadtgebiets (maximale Nord-Süd-Ausdehnung ca. \num{16.5} \si{\kilo\metre}), maximale Ost-West-Ausdehnung ca. \num{19.0} \si{\kilo\metre}) muss für die Anzahl an Kacheln \((n:=20)\) gewählt werden. \\
+\newline
+Allerdings muss erwähnt werden, dass die in Abbildung \ref{fig:Stadtgebiet_KA} dargestellte Gemarkung durch eine solche quadratische Analysefläche nur unzureichend angenähert werden kann. Dies zeigt ein Vergleich der Analyseergebnisse mit den Werten des Statistischen Landesamtes: hier wird der Anteil von Naturflächen mit ca. \num{52} \% angegeben, während die Analyse ca. \num{70} \% berechnet. Dies kann darauf zurückgeführt werden, dass bestimmte Bereiche wie beispielsweise große natürliche und landwirtschaftliche Bereiche in der Analyse erscheinen, obwohl sie nicht zum Stadtgebiet Karlsruhe gehören.\\
+%
+\newline
+\begin{figure}
+  \centering
+    \includegraphics[width=0.92\textwidth]{images/3_Kachelvergleich_KA_skip.png}
+    \caption{Ergebnisse der Flächenanalyse für den Stadtkreis Karlsruhe mit und ohne Kachelauswahl im Vergleich zu den statistischen Daten}
+    \label{fig:Kachel_skip_vgl}
+\end{figure}
+%
+%
+\newline
+\begin{figure}
+  \centering
+    \includegraphics[width=0.92\textwidth]{images/3_google_Einstufung_Nutzung.png}
+    \caption{Darstellung einer Straße in der Web-Ansicht (links) und Einstufung als man-made area nach dem Download (rechts)}
+    \label{fig:versch_nutz_einstuf}
+\end{figure}
+%
+Eine bessere Approximation kann durch gezielte Auswahl bzw. gezieltes Ausschließen einzelner Kacheln erreicht werden. Im Folgenden werden daher aus der Berechnung, die auf einer Kachelanzahl \((n:=20)\) basiert, diejenigen Kacheln ausgeschlossen, die außerhalb des Stadtgebietes liegen, sodass die übrigen die Stadtgrenze bestmöglich approximieren. Dadurch verringert sich die Gesamtzahl der analysierten Kacheln von  ursprünglich \(1521\) auf nun \(680\). Das Resultat der Berechnung mit selektiertem Analysegebiet ist in Abbildung \ref{fig:Kachel_skip_vgl} den Ergebnissen der Berechnung mit vollen \(1521\) Kacheln sowie den aufbereiteten Daten des Landesamtes gegenübergestellt. Hierbei ist zu beachten, dass im Gegensatz zur bisherigen Benennung die Kategorien \textit{roads}, \textit{highway} sowie \textit{transit} in dieser Darstellung zur Oberkategorie \textit{traffic} zusammengefasst wurden, um eine Vergleichbarkeit der Berechnungsergebnisse mit den statisitschen Daten, welche einer anderen Klassifizierung folgen, zu ermöglichen. Während die Flächenanteile der Kategorie \textit{man-made} in der Berechnung um weniger als  \num{2} \% von denen des statistischen Landesamtes abweichen, zeigt sich bei Verkehrsflächen respektive Naturflächen eine Abweichung von rund \num{5} bis \num{6} \%. Letzteres kann unter anderem auf die unterschiedlichen Einstufungen der Flächen als Siedlungs- oder als Verkehrsfläche zurückgeführt werden. Ein Beispiel hierfür ist der Bereich um das Ettlinger Tor in Karlsruhe, der in Abbildung \ref{fig:versch_nutz_einstuf} dargestellt ist: Während in der Webansicht von google maps (links) in Kachelmitte eine in Nord-Süd-Richtung verlaufende Straße zu erkennen ist, wird diese von google tatsächlich, wie sich bei der Analyse (rechts) zeigt, als \textit{man-made area} eingestuft.\\
 
 Anhand des Beispiels Karlsruhe konnte damit gezeigt werden, dass das entwickelte Verfahren die reale Flächenverteilung gut annähern kann. 
 
-% b) Verkehrliche Analyse
-\newpage
-\subsection{Verkehrsanalyse}
-
-% c) Ableitung eines allgemeinen Leitfadens
-\newpage
-\subsection{Ableitung eines allgemeinen Leitfadens}
-
-Um eine größere Menge verschiedener Städte möglichst schnell auf ihre verkehrliche Situation zu untersuchen, ist es sinnvoll, ein standardisiertes Vorgehen für die Erstellung einer Verkehrsuntersuchung festzulegen. Die Vorbereitung der Analyse läuft dabei wie folgt ab:
-
+\subsection{Leitfaden zur Verkehrsanalyse}
+Nachdem anhand des Beispiels Karlsruhe gezeigt worden ist, dass das entwickelte Verfahren zur Flächenanalyse die tatsächliche Flächennutzungen sehr gut darstellen kann, soll dessen Anwendung im weiteren Verlauf der Untersuchung bei einer Auswahl von Städten durchgeführt werden.
 \begin{enumerate}
-\item Die geographischen Koordinaten (lat, long) des Mittelpunktes der zentralen Kachel (0,0) wird festgelegt. Dies muss nicht zwingenderweise der in google oder bing maps hinterlegte zentrale Punkt einer Stadt sein. Vielmehr kann es durchaus sinnvoll sein, den Mittelpunkt möglichst mittig im später zu analysierenden Gebiet zu platzieren. Auf diese Weise kann die Anzahl benötigter Kacheln zur Abdeckung des Analysegebiets minimal gehalten werden.
-\newline
-\item Im Anschluss ist die Zoomstufe, in der die Kacheln geladen werden sollen, festzulegen. Hierbei treten zwei einschränkende Kriterien ein:\\
-Einerseits wird in einigen Städten eine minimale Zoomstufe durch die Auflösung der Gebäude- und Flächendaten vorgegeben. Bei Unterschreitung dieser wird das Ergebnis dahingehend verfälscht, dass sehr detailliert dargestellte Gebäudeumrisse in einer zu niedrigen Zoomstufe nicht als man-made area erkannt werden, sondern vielmehr den Naturflächen zugerechnet werden.\\
-Andererseits kann von Seiten der Verkehrsdaten eine minimale Zoomstufe notwendig sein, da kleinere Nebenstraßen z.T. erst in einer entsprechend hohen Zoomstufe angezeigt werden.\\
-In jedem Fall ist bei der Wahl der Zoomstufe zwischen Auflösung der Daten sowie Rechen- bzw. Speicheraufwand abzuwägen. Um den Aufwand gering zu halten, sollte die minimal mögliche Zoomstufe nicht deutlich überschritten werden.
-\newline
-\item Anhand der gewählten Zoomstufe wird nun die Anzahl an benötigten Kacheln evaluiert, die notwendig ist, um das gesamte Untersuchungsgebiet abzudecken. 
+\item Festlegen des Zentrums für die Kachelauswahl:
+\item Festlegen der Zoomstufe:
+\item Einstellung Anzahl Tiles:
+\item Auswahl zu überspringende Tiles:
 \end{enumerate}
 
 
+Um eine größere Menge verschiedener Städte möglichst schnell auf ihre verkehrliche Situation zu untersuchen, ist es sinnvoll, ein standardisiertes Vorgehen für die Erstellung einer Verkehrsuntersuchung festzulegen. Die Vorbereitung der Analyse läuft dabei wie folgt ab:
+
+%%%%%%%%%%%%
+% 4) Verkehrsanalyse %
+%%%%%%%%%%%%
+\newpage
+\section{Verkehrsanalyse}
+
+
 %%%%%%%%%%%%%
-% 4) Fazit und Ausblick %
+% 5) Fazit und Ausblick %
 %%%%%%%%%%%%%
 \newpage
 \section{Fazit und Ausblick}
