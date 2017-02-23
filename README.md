@@ -1,8 +1,8 @@
 # traffic-index
 Deutsch:
-Studentische Seminararbeit im Rahmen des Seminar Verkehrswesen am Institut für Verkehrswesen, Karlsruher Institut für Technologie. Ziel dieser Arbeit ist es, aus den Verkehrsinformationen von öffentlich zugänglichen Kartendiensten, einen "Stauindex" zu bilden,
-um eine zeitliche und räumliche Vergleichbarkeit des Verkhrssituation in verschiedenen Städten herzustellen. Außerdem werden die wesentlichen Bodebedeckungsdaten aus der Karte extrahiert, um Zusammenhänge zwischen der Stadtstruktur und dem berechneten Index zu ermitteln.
-Diese Arbeit stellt eine erste "Machbarkeitsstudie" dar und untersucht mögliche Vorgehensweisen und Beschränkungen bei der Umsetzung.      
+Studentische Seminararbeit im Rahmen des Seminar Verkehrswesen am Institut fï¿½r Verkehrswesen, Karlsruher Institut fï¿½r Technologie. Ziel dieser Arbeit ist es, aus den Verkehrsinformationen von ï¿½ffentlich zugï¿½nglichen Kartendiensten, einen "Stauindex" zu bilden,
+um eine zeitliche und rï¿½umliche Vergleichbarkeit des Verkhrssituation in verschiedenen Stï¿½dten herzustellen. Auï¿½erdem werden die wesentlichen Bodebedeckungsdaten aus der Karte extrahiert, um Zusammenhï¿½nge zwischen der Stadtstruktur und dem berechneten Index zu ermitteln.
+Diese Arbeit stellt eine erste "Machbarkeitsstudie" dar und untersucht mï¿½gliche Vorgehensweisen und Beschrï¿½nkungen bei der Umsetzung.      
 
 English:
 Student seminar reserach project at the Institute for traffic engineering at Karlsruhe Institute of Technology to analyse traffic information from  publicly available map services and turn them into an index for spatial and chronological comparison.
@@ -25,7 +25,7 @@ For this, see the section "Using a Virtual Environment" now.
 
 The following libraries have to be installed using `pip`:
 
-* -
+* pip install imageio
 
 ## Using a Virtual Environment
 

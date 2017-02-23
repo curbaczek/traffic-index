@@ -8,8 +8,6 @@ from lib import model
 from lib.util.file import clear_dir
 from lib.util.file import copy_dir
 
-from lib.data_handler import load_location
-
 DEFAULT_BUILD_DIRECTORY = 'build'
 LOCATION_DATA_DIRECTORY = 'data/locations'
 RES_DIRECTORY = 'res'
@@ -29,7 +27,7 @@ def generate_html(result, build_directory):
 
 def analyse_city(name, lat, lng, zoom_level, tile_count):
     location_data_dir = os.path.join(RES_DIRECTORY, LOCATION_DATA_DIRECTORY)
-    location = load_location(location_data_dir, name, lat, lng)
+    # location = load_location(location_data_dir, name, lat, lng)
 
     # TODO run area analysis
     # TODO run traffic analysis

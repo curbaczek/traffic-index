@@ -1,18 +1,22 @@
+"""
+analyses all given traffic tilemaps of a given location and writes the analysis
+result to a csv file
+"""
+
 import os
+import imageio
 import time
+import tempfile
 from time import strftime
-
-from PIL import Image
-from lib import model
 from datetime import datetime
+from lib import model
 
-from lib.data_handler import get_tile, get_tile_timestamp, get_tile_list, SUBDIR_TRAFFIC
+from lib.tile_analysis import TrafficTileMapAnalysis, DEFAULT_TRAFFIC_TILE_COLOR_THRESHOLD
+from lib.data_handler import get_tilemap_list, SUBDIR_TRAFFIC
 from lib.bing_tile_handler import BingTileHandler
-from lib.util.image_analysis import get_color_classes
-from lib.csv_handler import write_csv_data
-from lib.util.file import remove_file
+from lib.util.file import get_target_directory, remove_dir
 
-LOCATION_DIR = "res/data/locations"
+DEBUG_MODE = False
 
 
 def get_parser():
@@ -33,124 +37,146 @@ def get_parser():
                         required=True)
     parser.add_argument('--threshold',
                         type=int,
-                        default=30,
+                        default=DEFAULT_TRAFFIC_TILE_COLOR_THRESHOLD,
                         help="threshold of the image analysis")
+    parser.add_argument('--skip',
+                        type=str,
+                        help="comma-seperated list of tiles identified by their coordinates, e.g. '(0,0),(-1,-2)'",
+                        required=False,
+                        default="")
+    parser.add_argument('--analysis-time-start',
+                        type=str,
+                        help="start time (YYYY-MM-DD HH:MM:SS) of the tilemap analysis",
+                        default=None,
+                        dest='analysis_time_start',
+                        required=False)
+    parser.add_argument('--analysis-time-end',
+                        type=str,
+                        help="end time (YYYY-MM-DD HH:MM:SS) of the tilemap analysis",
+                        default=None,
+                        dest='analysis_time_end',
+                        required=False)
     parser.add_argument('--csv',
                         type=str,
                         help="file to save the analysis results as csv",
-                        default="",
+                        default=None,
                         dest='csv_out',
                         required=True)
+    parser.add_argument('--gif',
+                        type=str,
+                        help="file to save the gif animation of the analysed tiles",
+                        default=None,
+                        dest='gif_out',
+                        required=False)
+    parser.add_argument('--gif-size',
+                        type=int,
+                        help="maximum image size of the resulting gif file",
+                        default=0,
+                        dest='gif_out_size',
+                        required=False)
+    parser.add_argument('--gif-duration',
+                        type=float,
+                        help="duration of each image in the resulting gif file",
+                        default=0.5,
+                        dest='gif_out_duration',
+                        required=False)
+    parser.add_argument('--gif-time-start',
+                        type=str,
+                        help="start time (YYYY-MM-DD HH:MM:SS) of the tilemaps shown in the gif file",
+                        default=None,
+                        dest='gif_out_time_start',
+                        required=False)
+    parser.add_argument('--gif-time-end',
+                        type=str,
+                        help="end time (YYYY-MM-DD HH:MM:SS) of the tilemaps shown in the gif file",
+                        default=None,
+                        dest='gif_out_time_end',
+                        required=False)
 
     return parser
 
 
-def get_traffic_analysis(color_analysis_result):
-    heavy_traffic = color_analysis_result["red"]["count"]
-    moderate_traffic = color_analysis_result["orange"]["count"]
-    light_traffic = color_analysis_result["yellow"]["count"]
-    no_traffic = color_analysis_result["green"]["count"]
-    no_information = color_analysis_result["unknown"]["count"]
-
-    return model.TrafficAnalysis(
-        heavy_traffic,
-        moderate_traffic,
-        light_traffic,
-        no_traffic,
-        no_information,
-        unassigned=0)
+def get_timestamp(time_str):
+    result = None
+    if time_str is not None:
+        ttuple = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S").timetuple()
+        result = time.mktime(ttuple)
+    return result
 
 
-def get_target_directory(args):
-    latlng_dir = "{},{}".format(args.lat, args.lng)
-    return os.path.join(LOCATION_DIR, latlng_dir, SUBDIR_TRAFFIC)
+def generate_gif(args, all_traffic_tilemaps):
+    temp_gif_dir = tempfile.mkdtemp(prefix='gifgen_')
 
+    filter_from_timestamp = get_timestamp(args.gif_out_time_start)
+    filter_to_timestamp = get_timestamp(args.gif_out_time_end)
 
-def write_csv_headline(filename):
-    write_csv_data(filename, [
-        'x', 'y', 'time', 'traffic_portion_heavy [%]', 'traffi_portion_moderate [%]', 'traffic_portion_light [%]',
-        'traffic_portion_notraffic [%]', 'heavy [px]', 'moderate [px]', 'light [px]', 'notraffic [px]',
-        'noinformation [px]', 'unassigned [px]', 'calculation time [ms]', 'tile filename'])
+    print("--- save grid images of all tile maps that match time window ({}-{})".format(
+        "..." if args.gif_out_time_start is None else args.gif_out_time_start,
+        "..." if args.gif_out_time_end is None else args.gif_out_time_end))
+    tile_map_id = 0
+    prefix_length = len(str(len(all_traffic_tilemaps)))
+    tile_map_size = (args.gif_out_size, args.gif_out_size)
+    for tile_map in all_traffic_tilemaps:
+        tile_map_id += 1
+        if (filter_from_timestamp is not None and tile_map.timestamp < filter_from_timestamp) or\
+           (filter_to_timestamp is not None and tile_map.timestamp > filter_to_timestamp):
+            continue
+        tf_prefix = str(tile_map_id).zfill(prefix_length) + "_"
+        tf = tempfile.NamedTemporaryFile(prefix=tf_prefix, suffix=".png", delete=False, dir=temp_gif_dir)
+        tile_map.saveTileMapImage(tf.name, target_dir, show_grid_date=True, final_size=tile_map_size)
 
+    file_names = sorted((os.path.join(temp_gif_dir, fn) for fn in os.listdir(temp_gif_dir) if fn.endswith('.png')))
+    print("--- add all {} images to gif".format(len(file_names)))
+    kargs = {'duration': args.gif_out_duration}
+    with imageio.get_writer(args.gif_out, format="GIF", mode='I', **kargs) as writer:
+        for file_name in file_names:
+            image = imageio.imread(file_name)
+            writer.append_data(image)
+    print("--- gif file {} generated".format(args.gif_out))
 
-def write_analysis_result(filename, tile_filename, analysis_result, duration):
-    tile = get_tile(tile_filename)
-    traffic_sum = analysis_result.get_traffic_sum()
-    write_csv_data(filename, [
-        tile.x, tile.y,
-        datetime.fromtimestamp(tile.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
-        0.0 if traffic_sum == 0 else 100*analysis_result.heavy/traffic_sum,
-        0.0 if traffic_sum == 0 else 100*analysis_result.moderate/traffic_sum,
-        0.0 if traffic_sum == 0 else 100*analysis_result.light/traffic_sum,
-        0.0 if traffic_sum == 0 else 100*analysis_result.notraffic/traffic_sum,
-        analysis_result.heavy,
-        analysis_result.moderate,
-        analysis_result.light,
-        analysis_result.notraffic,
-        analysis_result.noinformation,
-        analysis_result.unassigned,
-        duration,
-        tile_filename])
+    remove_dir(temp_gif_dir)
 
-
-def get_color_class_definition():
-    return [
-        ("green", [(122, 187, 68), (117, 183, 66), (97, 166, 69)]),
-        ("red", [(210, 57, 64), (205, 63, 68), (206, 75, 76), (208, 59, 65)]),
-        ("orange", [(251, 195, 75), (252, 186, 74), (240, 167, 61)]),
-        ("yellow", [(244, 236, 87), (242, 232, 84), (240, 232, 86), (218, 194, 61)])
-    ]
-
-
-def generate_csv(args):
-    csv_file = args.csv_out
-    if (csv_file != ""):
-        remove_file(csv_file)
-        write_csv_headline(csv_file)
-    return csv_file
 
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
+    print("")
 
-    csv_file = generate_csv(args)
-
-    target_dir = get_target_directory(args)
-    print("set target directory '{}'".format(target_dir))
+    target_dir = get_target_directory(args.lat, args.lng, SUBDIR_TRAFFIC)
     os.makedirs(target_dir, exist_ok=True)
+    print("target directory '{}'".format(target_dir))
 
+    assert args.threshold > 0, "threshold must be positive"
     traffic_handler = BingTileHandler()
-    traffic_handler.setDebugMode(True)
+    traffic_handler.printer.setDebugMode(DEBUG_MODE)
+    search_data_src = traffic_handler.getDataSource()
+    search_file_format = traffic_handler.getFileFormat()
+    all_traffic_tilemaps = get_tilemap_list(target_dir, search_data_src, args.zoom, search_file_format)
+    print("found {} traffic tile maps in target directory".format(len(all_traffic_tilemaps)))
 
-    ANALYSE_THRESHOLD = args.threshold
-    assert ANALYSE_THRESHOLD > 0, "threshold must be positive"
-    NOINFORMATION_COLOR = (255, 255, 255)
+    analysis_from_timestamp = get_timestamp(args.analysis_time_start)
+    analysis_to_timestamp = get_timestamp(args.analysis_time_end)
+    print("analyse all tile maps that match time window ({}-{})".format(
+        "..." if args.analysis_time_start is None else args.analysis_time_start,
+        "..." if args.analysis_time_end is None else args.analysis_time_end))
 
-    color_green = (122, 187, 68)
-    color_red = (210, 57, 64)
-    color_orange = (251, 195, 75)
-    color_yellow = (244, 236, 87)
+    tile_map_id = 0
+    tile_map_analysed = 0
+    tile_map_skipped = 0
+    for tile_map in all_traffic_tilemaps:
+        tile_map_id += 1
+        if (analysis_from_timestamp is not None and tile_map.timestamp < analysis_from_timestamp) or\
+           (analysis_to_timestamp is not None and tile_map.timestamp > analysis_to_timestamp):
+            tile_map_skipped += 1
+            continue
+        tile_map.deactivateTiles(args.skip)
+        analysis = TrafficTileMapAnalysis(
+            tile_map, args.threshold, args.csv_out, DEBUG_MODE, init_csv=(tile_map_id == 1))
+        tile_map_analysed += 1
 
-    tile_list = get_tile_list(target_dir, traffic_handler.getDataSource(), args.zoom, traffic_handler.getFileFormat())
+    print("{} tiles analyzed, {} tiles skipped".format(tile_map_analysed, tile_map_skipped))
+    print("result written to {}".format(args.csv_out))
 
-    color_classes_definition = get_color_class_definition()
-    tile_no = 0
-    overall_start_time = time.time()
-    for tile in tile_list:
-
-        tile_no += 1
-        print("{:4d}/{:4d}: {}".format(tile_no, len(tile_list), tile))
-
-        tile_filename = os.path.join(target_dir, tile)
-        start_time = time.time()
-        color_classes = get_color_classes(tile_filename, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-        traffic_analysis = get_traffic_analysis(color_classes)
-        end_time = time.time()
-
-        (img_width, img_height) = Image.open(tile_filename).size
-        assert traffic_analysis.get_overall_sum() == img_width * img_height, \
-            "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
-                img_width * img_height, traffic_analysis.get_overall_sum())
-
-        executiontime = 1000*(end_time - start_time)
-        write_analysis_result(csv_file, tile, traffic_analysis, executiontime)
+    if args.gif_out is not None:
+        print("generate gif image")
+        generate_gif(args, all_traffic_tilemaps)

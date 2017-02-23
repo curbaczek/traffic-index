@@ -70,6 +70,9 @@ class TileHandler(ABC):
 
     printer = ConsolePrinter()
 
+    DOWNLOAD_MAX_RETRY = 3
+    DOWNLOAD_RETRY_SLEEP = 3
+
     @abstractmethod
     def getFileFormat(self):
         pass
@@ -97,14 +100,14 @@ class TileHandler(ABC):
     def getLatestTile(self, x, y, zoom, directory):
         latest_tile = get_latest_tile(directory, x, y, self.getDataSource(), zoom, self.getFileFormat())
         if (latest_tile is None):
-            self.printer.printIndentedDebugMsg("no local file found")
+            self.printer.printIndentedDebugMsg("no local file found, download tile")
         else:
             self.printer.printIndentedDebugMsg("tile '{}' found, download skipped".format(latest_tile))
         return latest_tile
 
-    def createTile(self, x, y, zoom):
+    def createTile(self, x, y, zoom, filepath=None):
         current_time = int(time.time())
-        return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat())
+        return model.Tile(x, y, self.getDataSource(), zoom, current_time, self.getFileFormat(), filepath)
 
     @abstractmethod
     def getTileLink(self, centerLatLng, zoom):
@@ -126,6 +129,27 @@ class TileHandler(ABC):
         return get_tile_filename(
             tile.x, tile.y, tile.data_src, tile.zoom, tile.timestamp, tile.file_format)
 
+    def downloadTile(self, url, path):
+        success = False
+        tries = 0
+        abort_retry = False
+        while not(success) and not(abort_retry):
+            try:
+                tries += 1
+                self.printer.printIndentedDebugMsg("download file")
+                download_file(url, path)
+                self.printer.printIndentedDebugMsg("download successfull")
+                sleep(self.getSleepTime())
+                success = True
+            except Exception as e:
+                self.printer.printErrorMsg("try {} of {}: can not download tile image {} ({})".format(
+                    tries, self.DOWNLOAD_MAX_RETRY, url, str(e)))
+                if tries < self.DOWNLOAD_MAX_RETRY:
+                    sleep(self.DOWNLOAD_RETRY_SLEEP)
+                else:
+                    abort_retry = True
+        return success
+
     def getTileImage(self, lat, lng, x, y, zoom, local_directory, check_latest_tile=True):
         self.printer.printDebugMsg("load image {:+d}x{:+d}".format(x, y))
         tile_center = self.getMapCenter(lat, lng, zoom, x, y)
@@ -134,18 +158,23 @@ class TileHandler(ABC):
         if (tile_filename is None):
             tile_filename = self.getTileFilename(x, y, zoom)
             tile_path = join(local_directory, tile_filename)
-            download_file(tile_url, tile_path)
-            image.bottom_crop_image(tile_path, self.getTileBottomMargin())
-            self.printer.printIndentedDebugMsg("new tile downloaded")
-            sleep(self.getSleepTime())
-        return tile_filename
+            if self.downloadTile(tile_url, tile_path):
+                image.bottom_crop_image(tile_path, self.getTileBottomMargin())
+                self.printer.printIndentedDebugMsg("new tile downloaded")
+            else:
+                tile_filename = None
+        return None if tile_filename is None else join(local_directory, tile_filename)
 
     def getTiles(self, lat, lng, zoom, tile_count, local_directory, check_latest_tile=True):
         tile_list = []
         for x in range(1-tile_count, tile_count):
             for y in range(1-tile_count, tile_count):
                 new_tile = self.getTileImage(lat, lng, x, y, zoom, local_directory, check_latest_tile)
-                tile_list.append(new_tile)
+                if new_tile is not None:
+                    tile_list.append(new_tile)
+                else:
+                    self.printer.printErrorMsg("tiles loading aborted beacause at least one tile could not be loaded")
+                    return []
         return tile_list
 
 
