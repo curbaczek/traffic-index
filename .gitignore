@@ -15,3 +15,5 @@
 *~
 /res/data/locations/*
 /temp/*
+.DS_Store
+/__pycache__
