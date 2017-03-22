@@ -22,6 +22,9 @@ clean:
 	find . -name "*.pyc" -exec rm {} \;
 	find . -name "*~" -exec rm {} \;
 	find . -name "__pycache__" -exec rmdir {} \;
+	find . -name "*.aux" -exec rm {} \;
+	find . -name "*.out" -exec rm {} \;
+	find . -name "*.toc" -exec rm {} \;
 
 karlsruhe:
 	$(run_get_area) --lat 49.0068900 --lng 8.4036530 --zoom 17 --tiles 5 --skip "(-4,-4),(-3,-4),(-2,-4),(-1,-4),(4,4)" --show_grid_image

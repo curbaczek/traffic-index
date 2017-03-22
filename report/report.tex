@@ -1,0 +1,57 @@
+\documentclass[12pt,a4paper]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+% \usepackage[latin1]{inputenc} %  Alternativ unter Windows
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{latexsym}
+\usepackage{amsmath,amssymb,amsthm}
+
+% Links einbinden:
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
+
+% SI-Units einbinden:
+\usepackage{siunitx}
+\sisetup{locale = DE ,per-mode = symbol}
+
+% Abstand obere Blattkante zur Kopfzeile ist 2.54cm - 15mm
+\setlength{\topmargin}{-15mm}
+
+
+\begin{document}
+
+  % title page and tabel of contents
+  \pagestyle{empty}
+  \include{report_titlepage}
+  \tableofcontents
+  \newpage
+ 
+  % report content
+  \pagestyle{headings}
+  \include{report_motivation}
+  \newpage
+  \include{report_implementation}
+  \newpage
+  \include{report_process_development}
+  \newpage
+  \include{report_traffic_analysis}
+  \newpage
+  \include{report_conclusion}
+
+  % bibliography
+  \newpage
+  \include{report_bibliography}
+       
+  % ggf. hier Tabelle mit Symbolen 
+  % (kann auch auf das Inhaltsverzeichnis folgen)
+  \newpage
+  \thispagestyle{empty}
+  \vspace*{8cm}
+
+  % statement
+  \include{report_statement}
+
+\end{document}
+

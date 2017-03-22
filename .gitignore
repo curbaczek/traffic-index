@@ -17,4 +17,4 @@
 /temp/*
 .DS_Store
 /__pycache__
-/report/bachelorarbeit-vorlage.pdf
+/report/*.pdf
