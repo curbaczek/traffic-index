@@ -23,9 +23,9 @@ To avoid version conflicts, all tools and libraries used are installed via `pip`
 If your user is not allowed to install system-wide, consider using `virtualenv`.
 For this, see the section "Using a Virtual Environment" now.
 
-The following libraries have to be installed using `pip`:
+The following libraries have to be installed:
 
-* pip install imageio
+* imageio (http://imageio.readthedocs.io/en/latest/installation.html)
 
 ## Using a Virtual Environment
 

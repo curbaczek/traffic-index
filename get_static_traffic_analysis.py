@@ -7,8 +7,10 @@ import subprocess
 from PIL import Image
 from lib import model
 from ast import literal_eval
+from lib.model import Tile
 
-from lib.data_handler import get_tile, SUBDIR_TRAFFIC
+from lib.tile_analysis import TrafficAnalysisResult
+from lib.data_handler import SUBDIR_TRAFFIC
 from lib.bing_tile_handler import BingTileHandler
 from lib.util.image_analysis import get_color_count, get_color_classes, get_filled_up_image
 
@@ -83,7 +85,7 @@ def get_traffic_analysis(color_analysis_result):
     no_traffic = color_analysis_result["green"]["count"]
     no_information = color_analysis_result["unknown"]["count"]
 
-    return model.TrafficAnalysis(
+    return TrafficAnalysisResult(
         heavy_traffic,
         moderate_traffic,
         light_traffic,
@@ -162,12 +164,12 @@ if __name__ == "__main__":
 
         print("*** traffic analysis {} ***".format(tile_file))
 
-        tile_element = get_tile(tile_file)
+        tile_element = Tile.fromfile(tile_file)
         if ((tile_element.x, tile_element.y) in skip_list):
             print("tile skipped")
             continue
 
-        tile_filename = os.path.join(target_dir, tile_file)
+        tile_filename = tile_file
         color_classes = get_color_classes(tile_filename, color_classes_definition, threshold=ANALYSE_THRESHOLD)
         traffic_analysis = get_traffic_analysis(color_classes)
 
@@ -224,9 +226,9 @@ if __name__ == "__main__":
         tf = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         tileMap = model.TileMap()
         for tile_file in tile_list:
-            tile = get_tile(tile_file)
+            tile = Tile.fromfile(tile_file)
             tileMap.appendTile(tile)
-        tileMap.setSkippedTilesList(skip_list)
+        tileMap.deactivateTiles(skip_list)
         tileMap.saveTileMapImage(tf.name, target_dir)
         print("temporay tile image generated ({})".format(tf.name))
         print("try to open the grid image ...")

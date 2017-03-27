@@ -70,7 +70,7 @@ traffic-paris:
 	#$(run_get_traffic) --lat 52.5171480 --lng 13.3936320 --zoom 14 --tiles 3 --show_color_classes_image
 
 traffic-san-fransisco:
-	$(run_get_traffic) --lat 37.7532400 --lng -122.4473590 --zoom 15 --tiles 3 --check_latest_tile --show_grid_image
+	$(run_get_traffic) --lat 37.7532400 --lng -122.4473590 --zoom 15 --tiles 3 --check_latest_tile --show_grid_image --show_color_classes_image
 
 traffic-shanghai:
 	$(run_get_traffic) --lat 31.2243220 --lng 121.4691240 --zoom 17 --tiles 3

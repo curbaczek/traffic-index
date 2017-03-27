@@ -152,7 +152,7 @@ if __name__ == "__main__":
     search_data_src = traffic_handler.getDataSource()
     search_file_format = traffic_handler.getFileFormat()
     all_traffic_tilemaps = get_tilemap_list(target_dir, search_data_src, args.zoom, search_file_format)
-    print("found {} traffic tile maps in target directory".format(len(all_traffic_tilemaps)))
+    print("found {} traffic tile maps with the given zoom in target directory".format(len(all_traffic_tilemaps)))
 
     analysis_from_timestamp = get_timestamp(args.analysis_time_start)
     analysis_to_timestamp = get_timestamp(args.analysis_time_end)
