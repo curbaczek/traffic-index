@@ -51,7 +51,26 @@ Ausgehend von diesen Überlegungen wurde ein Kachelsystem entworfen, welches von
 \subsection{Flächenanalyse}
 \label{sec:area-analysis}
 
-Die Flächenanalyse 
+Die Flächenanalyse dient der Voranalyse und Einschätzung des untersuchten Gebiets. Durch Anwendung der Analyse auf die einzelnen ermitteltenden Kacheln kann zudem eine Eingrenzung des Suchgebiets erreicht werden. Für die Ermittlung des Kartenmaterials kommt  die statische Schnittstelle von GoogleMaps zum Einsatz, da sich das System aufgrund seiner individuellen Einstellungsmöglichkeiten besonders dazu eignen die gewünschte Flächennutzung auszulesen. Folgende Kennwerte werden bei der Flächennutzung ermittelt:
+
+\begin{itemize}
+\item Bebaute Fläche (man-made)
+\item Naturfläche (nature)
+\item Öffentlicher Verkehr (transit)
+\item Straßen (road)
+\item Autobahnen und Schnellstraßen (highway)
+\end{itemize}
+
+Zum Zwecke einer schnellen und direkten Analyse wurde der Ansatz der Karteneinfärbung genutzt. Dazu werden die umfangreichen Einstellungsmöglichkeiten der GooleMaps API genutzt, um jeden Flächentypen individuell einzufärben. Eine darauf folgende Bildanalyse ermöglicht schnell Rückschlüsse auf die Anteile der Flächennutzung einzelner Kacheln wie auch des gesamten Untersuchungsgebiets. Abbildung \ref{fig:ka_area_analysis} zeigt einen Ausschnitt des Karlsruher Bahnhofs samt Umgebung, in der die unterschiedlichen Farbgebungen deutlich werden.\\
+
+Das Tool übernimmt nach Übergabe der wichtigsten Einstellungsparameter die vollständige Analyse. Das System ermittelt in einem ersten Schritt die benötigten Kacheln und lädt sie (falls nicht bereits in einer vorherigen Analyse geschehen) über die Schnittstelle eingefärbt herunter. Die ermittelten Flächenanteile können direkt ausgegeben oder optional in eine CSV-Datei gespeichert werden. Die Generierung der angewendeten Kachelmatrix ermöglicht zudem eine schnelle Übersicht der analysierten Kacheln und ist im Ausschnitt \ref{fig:ka_area_analysis} ebenfalls erkennbar.
+
+\begin{figure}
+  \centering
+    \includegraphics[width=0.9\textwidth]{images/karlsruhe_area_analysis_ausschnitt.png}
+    \caption{Ausschnitt der Flächenanalyse der Stadt Karlsruhe auf Zoomstufe 17 und Kachelmenge 5}
+    \label{fig:ka_area_analysis}
+\end{figure}
 
 \subsection{Verkehrsanalyse}
 \label{sec:traffic-analysis}
