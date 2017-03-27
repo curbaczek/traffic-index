@@ -61,7 +61,7 @@ Die Flächenanalyse dient der Voranalyse und Einschätzung des untersuchten Gebi
 \item Autobahnen und Schnellstraßen (highway)
 \end{itemize}
 
-Zum Zwecke einer schnellen und direkten Analyse wurde der Ansatz der Karteneinfärbung genutzt. Dazu werden die umfangreichen Einstellungsmöglichkeiten der GooleMaps API genutzt, um jeden Flächentypen individuell einzufärben. Eine darauf folgende Bildanalyse ermöglicht schnell Rückschlüsse auf die Anteile der Flächennutzung einzelner Kacheln wie auch des gesamten Untersuchungsgebiets. Abbildung \ref{fig:ka_area_analysis} zeigt einen Ausschnitt des Karlsruher Bahnhofs samt Umgebung, in der die unterschiedlichen Farbgebungen deutlich werden.\\
+Zum Zwecke einer schnellen und direkten Analyse wurde der Ansatz der Karteneinfärbung genutzt. Dazu werden die umfangreichen Einstellungsmöglichkeiten der GooleMaps API genutzt, um jeden Flächentypen individuell einzufärben. Die API bietet dabei detailierte Einflussmöglichkeiten auf die Flächeneinfärbung, die Darstellung der Beschriftungen sowie auf die Darstellung der Symbole und kann sehr gut den Bedürfnissen für die Bildanalyse vorbereitet werden. Eine darauf folgende Bildanalyse ermöglicht schnell Rückschlüsse auf die Anteile der Flächennutzung einzelner Kacheln wie auch des gesamten Untersuchungsgebiets. Abbildung \ref{fig:ka_area_analysis} zeigt einen Ausschnitt des Karlsruher Bahnhofs samt Umgebung, in der die unterschiedlichen Farbgebungen deutlich werden.\\
 
 Das Tool übernimmt nach Übergabe der wichtigsten Einstellungsparameter die vollständige Analyse. Das System ermittelt in einem ersten Schritt die benötigten Kacheln und lädt sie (falls nicht bereits in einer vorherigen Analyse geschehen) über die Schnittstelle eingefärbt herunter. Die ermittelten Flächenanteile können direkt ausgegeben oder optional in eine CSV-Datei gespeichert werden. Die Generierung der angewendeten Kachelmatrix ermöglicht zudem eine schnelle Übersicht der analysierten Kacheln und ist im Ausschnitt \ref{fig:ka_area_analysis} ebenfalls erkennbar.
 
@@ -75,8 +75,9 @@ Das Tool übernimmt nach Übergabe der wichtigsten Einstellungsparameter die vol
 \subsection{Verkehrsanalyse}
 \label{sec:traffic-analysis}
 
-%Flächenanalyse
-%- Google, Kachelsystem, Einfärbung, Analyse
+Die Verkehrsanalyse wird genutzt um Momentaufnahmen oder zeitliche Verläufe der Verkehrssituation innerhalb des Untersuchungsgebiets zu erfassen und zu analysieren. Wie bereits in \ref{sec:kartendienste} dargelegt bietet nur der Kartendienst von Bing eine Schnittstelle, um die Verkehrsinformationen per statischer Schnittstelle auszulesen. Bing bietet ebenso wie Google einige Einstellungsmöglichkeiten beim Kartenabruf aber im Gegensatz zu Google ist keine Einflussnahme auf die direkte Darstellung der Karte möglich. Da das Kartenmaterial nicht so effektiv verarbeitet werden kann wie das von Google muss die Verkehrsanalyse ohne zusätzliches Kartenmaterial auskommen, was in einem ersten Schritt mit dem der Flächenanalyse abgeglichen werden muss. Beide Kartendienste arbeiten auf der Mercator-Projektion, wodruch das eingesetzte Kachelsystem (siehe \ref{sec:kachelsystem}) auf beide Systeme anwendbar ist. Die ermittelten Kacheln können daher auch bei Bing berechnet sowie abgerufen werden und ermöglichen die direkte Verknüpfung mit den Flächenanalyseergebnissen.
+
+
 
 %Verkehrsanalyse
 %- Here, Kachelabgleich, Negativbild, Animation, Aufnahmereihe, Verkehrsanteile
