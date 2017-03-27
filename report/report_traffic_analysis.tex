@@ -22,7 +22,7 @@ Die angegebenen Farben sind dabei nur bedingt proportional zur Verkehrsstärke u
 \includegraphics[width = 0.48\textwidth]{images/heavy_traffic.png} \\
 \textbf{mittlerer Verkehr} & \textbf{dichter Verkehr}\\
 \end{tabular}
-\caption{Bilder von Verkehrskameras zu den Verkehrszustände kein Verkehr, leichter verkehr, mittlerer Verkehr und dichter Verkehr aus Bing Maps}
+\caption{Bilder von Verkehrskameras zu den Verkehrszustände kein Verkehr, leichter verkehr, mittlerer Verkehr und dichter Verkehr aus BingMaps}
 \label{fig:uebersicht_verkehrszustaende}
 \end{figure}
 
@@ -60,7 +60,7 @@ Diese Voraussetzungen lassen sich mit folgender Gleichung abbilden:
 \item $p_{mit Info}$: Anteil der mit Verkehrsinformationen belegten Pixeln
 \end{itemize}
 
-Bei der Abbildung der Verkehrssituation auf einen Stauindex und der Vergleichbarkeit zwischen Städten treten mehrere Probleme auf. Zum Einen wird die Verkehrssituation in verschiedenen Städten aufgrund der unterschiedlichen Datenverfügbarkeit von Bing Maps unterschiedlich dargestellt. Große Städte wie Berlin verfügen oft über sehr umfangreiche Verkehrsinformationen. In kleinen und mittelgroßen Städten sind i.d.R. nur Verkehrsinformationen für die größten Straßen verfügbar, während andere verkehrlich relevante Straßen über keine Informationen verfügen.\\ Der Mangel an Informationen deutet in erster Linie auf wenig Verkehrsteilnehmer und somit eine gute Verkehrssituation hin. Jedoch können die Gründe hierfür auch in den von Bing Maps verwendeten Algorithmen oder einem geringen Smartphonebesitz liegen. Dies führt zu einer schlechteren Darstellung der Verkehrssituation in kleinen und mittelgroßen Städten, da der guten Verkehrssituation auf verkehrlich relevanten Straßen nicht Rechnung getragen wird.\\  
+Bei der Abbildung der Verkehrssituation auf einen Stauindex und der Vergleichbarkeit zwischen Städten treten mehrere Probleme auf. Zum Einen wird die Verkehrssituation in verschiedenen Städten aufgrund der unterschiedlichen Datenverfügbarkeit von BingMaps unterschiedlich dargestellt. Große Städte wie Berlin verfügen oft über sehr umfangreiche Verkehrsinformationen. In kleinen und mittelgroßen Städten sind i.d.R. nur Verkehrsinformationen für die größten Straßen verfügbar, während andere verkehrlich relevante Straßen über keine Informationen verfügen.\\ Der Mangel an Informationen deutet in erster Linie auf wenig Verkehrsteilnehmer und somit eine gute Verkehrssituation hin. Jedoch können die Gründe hierfür auch in den von BingMaps verwendeten Algorithmen oder einem geringen Smartphonebesitz liegen. Dies führt zu einer schlechteren Darstellung der Verkehrssituation in kleinen und mittelgroßen Städten, da der guten Verkehrssituation auf verkehrlich relevanten Straßen nicht Rechnung getragen wird.\\  
 Eine Möglichkeit dieses Problem zu beheben besteht darin, die aus GoogleMaps ermittelte gesamte Straßenfläche einer Stadt mit einem Gewichtungsfaktor einzubeziehen. Dabei bleibt jedoch die Frage offen, welcher Anteil der Straßen einer Stadt als verkehrlich relevant anzusehen ist.\\
 Ein weiteres Problem besteht zu Schwachlastzeiten, wenn besondere Verkehrsbeeinträchtigungen eintreten. Zu diesen Zeiten sind aufgrund der geringen Anzahl an Verkehrsteilnehmern weniger Straßen mit Verkehrsinformationen belegt. Dieser Zustand ist in Abbildung~\ref{fig:stauindex_problem} beispielhaft dargestellt. 
 
