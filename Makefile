@@ -63,7 +63,7 @@ traffic-karlsruhe:
 	$(run_get_traffic) --lat 49.0068900 --lng 8.4036530 --zoom 15 --tiles 2 --show_grid_image --check_latest_tile
 
 traffic-berlin:
-	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 1 --show_color_classes_image
+	$(run_get_traffic) --lat 52.517148 --lng 13.393632 --zoom 14 --tiles 1 --check_latest_tile --show_color_classes_image --show_grid_image
 
 traffic-paris:
 	$(run_get_traffic) --lat 52.5171480 --lng 13.3936320 --zoom 14 --tiles 3
@@ -73,10 +73,10 @@ traffic-san-fransisco:
 	$(run_get_traffic) --lat 37.7532400 --lng -122.4473590 --zoom 15 --tiles 3 --check_latest_tile --show_grid_image --show_color_classes_image
 
 traffic-shanghai:
-	$(run_get_traffic) --lat 31.2243220 --lng 121.4691240 --zoom 17 --tiles 3
+	$(run_get_traffic) --lat 31.2243220 --lng 121.4691240 --zoom 17 --tiles 1 --threshold 1 --check_latest_tile --show_grid_image --show_color_classes_image
 
 traffic-stuttgart:
-	$(run_get_traffic) --lat 48.7775610 --lng 9.1785610 --zoom 14 --tiles 3
+	$(run_get_traffic) --lat 48.7775610 --lng 9.1785610 --zoom 14 --tiles 1 --check_latest_tile --show_grid_image --show_color_classes_image
 
 traffic-freiburg:
 	$(run_get_traffic) --lat 47.9938040 --lng 7.8325110 --zoom 15 --tiles 3

@@ -102,9 +102,9 @@ def get_target_directory(args):
 
 def get_color_class_definition():
     return [
-        ("green", [(122, 187, 68), (117, 183, 66), (97, 166, 69)]),
-        ("red", [(210, 57, 64), (205, 63, 68), (206, 75, 76), (208, 59, 65)]),
-        ("orange", [(251, 195, 75), (252, 186, 74), (240, 167, 61)]),
+        ("green", [(122, 187, 68), (117, 183, 66), (97, 166, 69), (51, 177, 0)]),
+        ("red", [(210, 57, 64), (205, 63, 68), (206, 75, 76), (208, 59, 65), (220, 0, 0)]),
+        ("orange", [(251, 195, 75), (252, 186, 74), (240, 167, 61), (255, 205, 0)]),
         ("yellow", [(244, 236, 87), (242, 232, 84), (240, 232, 86), (218, 194, 61)])
     ]
 
@@ -149,12 +149,6 @@ if __name__ == "__main__":
 
     ANALYSE_THRESHOLD = args.threshold
     assert ANALYSE_THRESHOLD > 0, "threshold must be positive"
-    NOINFORMATION_COLOR = (255, 255, 255)
-
-    color_green = (122, 187, 68)
-    color_red = (210, 57, 64)
-    color_orange = (251, 195, 75)
-    color_yellow = (244, 236, 87)
 
     tile_list = get_tile_list(args, target_dir)
     skip_list = get_skip_list(args.skip)
@@ -184,12 +178,19 @@ if __name__ == "__main__":
         print(traffic_analysis)
         (img_width, img_height) = Image.open(tile_filename).size
         assert traffic_analysis.get_overall_sum() == img_width * img_height, \
-            "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
+            "pixel sum {:d} does not equal analysis pixel sum {:d}".format(
                 img_width * img_height, traffic_analysis.get_overall_sum())
 
         if args.show_color_classes_image:
 
             print("*** generate fill-up image {} ***".format(tile_file))
+
+            NOINFORMATION_COLOR = (255, 255, 255)
+
+            color_green = (122, 187, 68)
+            color_red = (210, 57, 64)
+            color_orange = (251, 195, 75)
+            color_yellow = (244, 236, 87)
 
             color_translation = {
                 "green": color_green,
@@ -205,17 +206,19 @@ if __name__ == "__main__":
                         (color_translation[color_definition[0]], color)
                     )
 
+            print(fill_color_definiton)
+
             tmp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
             get_filled_up_image(
                 tile_filename, tmp_file.name, fill_color_definiton,
                 threshold=ANALYSE_THRESHOLD, unassigned_color=NOINFORMATION_COLOR)
             color_classes = get_color_classes(tmp_file.name, color_classes_definition, threshold=ANALYSE_THRESHOLD)
-            Image.open(tile_filename).show()
+            Image.open(tmp_file.name).show()
             subprocess.call(["open", tmp_file.name])
 
             traffic_analysis_check = get_traffic_analysis(color_classes)
             assert traffic_analysis_check.get_overall_sum() == img_width * img_height, \
-                "pixel sum {:d} does not equeal analysis pixel sum {:d}".format(
+                "pixel sum {:d} does not equal analysis pixel sum {:d}".format(
                     img_width * img_height, traffic_analysis_check.get_overall_sum())
             assert traffic_analysis.get_traffic_sum() == traffic_analysis_check.get_traffic_sum(), \
                 "fill-up image analysis pixel sum {:d} differs from original image analysis {:d}".format(
