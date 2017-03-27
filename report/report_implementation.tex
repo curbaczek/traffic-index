@@ -1,12 +1,9 @@
 \section{Technische Umsetzung}
 \label{sec:technische_umsetzung}
 
-%TODO identischer Inhalt mit Motivation
-Ziel dieses Seminars war die Auslotung von Möglichkeiten die Daten öffentlich zugänglicher Quellen zu nutzen, um für fest definierte Untersuchungsgebiete erste Bewertungen der Verkehrssituation vorzunehmen. Diese Informationen können dazu dienen die Verkehrssituation auf einzelnen Streckenabschnitten zu untersuchen oder eine Bewertungsgrundlage zur Beurteilung bestehender Maßnahmen auf städtplanerischer Ebene zu schaffen. Vor allem in der Voranalyse kann dies Verkehrsplanern helfen einen ersten Überblick über die Verkehrssituation eines neuen Untersuchungsgebietes zu erhalten und damit erste Rückschlüsse auf Zusammenhänge und Problemfelder zuzulassen, die im Folgenden genauer untersucht werden können.\\
-
 Das entwickelte Tool konzentriert sich auf die Ermittlung und Bewertung von öffentlich zugänglichen Verkehrsdaten und ermöglicht durch Momentaufnahmen und längere Untersuchungszeiträume eine erste Beurteilung der zeitlichen Entwicklung der Verkehrssituation innerhalb des definierten Untersuchungsgebiets. Angereichert werden diese Daten mit Flächeninformationen, die erste Rückschlüsse auf den Bebauungsgrad sowie die bestehende Infrastruktur geben und die zusätzlich zur Eingrenzung des Untersuchungsgebiets genutzt werden können.\\
 
-Die Anforderungen jeder Untersuchung sind sehr individuell, weswegen bei der Entwicklung darauf geachtet wurde, dass stets sowohl bei der Datenerfassung wie auch der Datenanalyse die Untersuchungsparameter beim Programmaufruf eingestellt werden können. Somit ermöglicht das Tool sowohl makroskopische Betrachtungen wie beispielsweise die Bewertung der Verkehrssituation einer Stadt ebenso wie die Untersuchung ausgewählter Streckenabschnitte oder einzelner Straßen.
+Die Anforderungen jeder Untersuchung sind sehr individuell, weswegen bei der Entwicklung darauf geachtet wurde, dass stets sowohl bei der Datenerfassung wie auch der Datenanalyse die Untersuchungsparameter beim Programmaufruf eingestellt werden können. Somit ermöglicht das Tool sowohl makroskopische Betrachtungen wie beispielsweise die Bewertung der Verkehrssituation einer Stadt ebenso wie die Untersuchung ausgewählter Streckenabschnitte oder einzelner Straßen.\\
 
 \subsection{Auswahl der verwendeten Kartendienste}
 \label{sec:kartendienste}
@@ -35,7 +32,7 @@ GoogleMaps verwendet wie auch Here für ihre Karten die Mercator-Projektion. Mit
     \includegraphics[height=6cm]{images/pixelCoordinates.png} &
     \includegraphics[height=6cm]{images/tileCoordinates.png} \\
 \end{tabular}
-\caption{Veranschaulichung der Basiskachel bei Zoomstufe 0 (links) und die Einteilung in Kacheln (rechts)}
+\caption{Veranschaulichung der Basiskachel bei Zoomstufe 0 (links) und die Einteilung in Kacheln (rechts), Quelle GoogleMaps API~\cite{googlemaptype}}
 \label{fig:pixelcoordinates}
 \end{figure}
 
